@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, nextTick } from 'vue'
+import { computed, nextTick, ref } from 'vue'
 import { HoverButton, SvgIcon } from '@/components/common'
 import { useAppStore, useChatStore } from '@/store'
 
@@ -11,7 +11,6 @@ interface Emit {
   (ev: 'export'): void
   (ev: 'handleClear'): void
 }
-
 defineProps<Props>()
 
 const emit = defineEmits<Emit>()
@@ -36,9 +35,6 @@ function handleExport() {
   emit('export')
 }
 
-function handleClear() {
-  emit('handleClear')
-}
 </script>
 
 <template>
@@ -55,21 +51,16 @@ function handleClear() {
           <SvgIcon v-else class="text-2xl" icon="ri:align-right" />
         </button>
       </div>
-      <h1
+      <h1 v-if="usingContext"
         class="flex-1 px-4 pr-6 overflow-hidden cursor-pointer select-none text-ellipsis whitespace-nowrap"
         @dblclick="onScrollToTop"
       >
         {{ currentChatHistory?.title ?? '' }}
       </h1>
-      <div class="flex items-center space-x-2">
+      <div class="flex items-center space-x-2" v-if="usingContext">
         <HoverButton @click="handleExport">
-          <span class="text-xl text-[#4f555e] dark:text-white">
-            <SvgIcon icon="ri:download-2-line" />
-          </span>
-        </HoverButton>
-        <HoverButton @click="handleClear">
-          <span class="text-xl text-[#4f555e] dark:text-white">
-            <SvgIcon icon="ri:delete-bin-line" />
+          <span class="text-3xl text-[#5d5cde] dark:text-white">
+            <SvgIcon icon="fluent:share-16-regular" />
           </span>
         </HoverButton>
       </div>

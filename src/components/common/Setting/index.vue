@@ -25,11 +25,15 @@ const isChatGPTAPI = computed<boolean>(() => !!authStore.isChatGPTAPI)
 
 const active = ref('General')
 
+// 创建计算属性 show，用于实现双向绑定
 const show = computed({
+  // get 方法用于获取这个计算属性 show 的值，此处返回父组件传递的 props 中的 visible 属性值
   get() {
     return props.visible
   },
+  // set 方法用于设置计算属性的值，当计算属性 show 发生变化时触发，visible 是新的值
   set(visible: boolean) {
+    // 使用 emit 发送一个名为 'update:visible' 的事件，将新的值 visible 传递给父组件
     emit('update:visible', visible)
   },
 })

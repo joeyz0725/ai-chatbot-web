@@ -1,18 +1,41 @@
 import { defineStore } from 'pinia'
-import { defaultState, getLocalState, setLocalState } from './helper'
+import { defaultState, getChatState, setLocalState, setServerState } from './helper'
 import { router } from '@/router'
+import { t } from '@/locales'
 
 export const useChatStore = defineStore('chat-store', {
-  state: (): Chat.ChatState => getLocalState(),
-
+  // 1. state: 表示在 Vue 3 组件中创建状态的声明。
+  // 2. (): 表示一个匿名函数，这里没有传入参数。
+  // 3. Chat.ChatState: Chat 命名空间中的 ChatState 接口，定义了组件的状态结构。
+  // 4. =>: 箭头函数的语法，指定了函数体的执行逻辑。
+  // 5. getLocalState(): 调用 getLocalState 函数，该函数可能返回一个符合 Chat.ChatState 接口的对象。 
+  state: (): Chat.ChatState => getChatState(),
+  
   getters: {
+    getActive(state) {
+      return state.active
+    }, 
+    getActiveTitle(state) {
+      return state.activeTitle
+    }, 
     getChatHistoryByCurrentActive(state: Chat.ChatState) {
       const index = state.history.findIndex(item => item.uuid === state.active)
       if (index !== -1)
         return state.history[index]
       return null
     },
-
+    getHistoryAndIndexByCurrentActive(state: Chat.ChatState) {
+      let activeHistory = {}
+      const index = state.history.findIndex(item => item.uuid === state.active)
+      if (index !== -1) {
+        activeHistory = {
+          ...state.history[index],
+          'index': index
+        }
+        return activeHistory
+      }
+      return null
+    },
     getChatByUuid(state: Chat.ChatState) {
       return (uuid?: number) => {
         if (uuid)
@@ -32,13 +55,14 @@ export const useChatStore = defineStore('chat-store', {
       this.history.unshift(history)
       this.chat.unshift({ uuid: history.uuid, data: chatData })
       this.active = history.uuid
+      this.activeTitle = history.title
       this.reloadRoute(history.uuid)
     },
 
-    updateHistory(uuid: number, edit: Partial<Chat.History>) {
+    updateHistory(uuid: number, title: string, edit: Partial<Chat.History>) {
       const index = this.history.findIndex(item => item.uuid === uuid)
       if (index !== -1) {
-        this.history[index] = { ...this.history[index], ...edit }
+        this.history[index] = { ...this.history[index], title, ...edit }
         this.recordState()
       }
     },
@@ -49,13 +73,16 @@ export const useChatStore = defineStore('chat-store', {
 
       if (this.history.length === 0) {
         this.active = null
+        this.activeTitle = null
         this.reloadRoute()
         return
       }
 
       if (index > 0 && index <= this.history.length) {
         const uuid = this.history[index - 1].uuid
+        const title = this.history[index - 1].title
         this.active = uuid
+        this.activeTitle = title
         this.reloadRoute(uuid)
         return
       }
@@ -63,20 +90,25 @@ export const useChatStore = defineStore('chat-store', {
       if (index === 0) {
         if (this.history.length > 0) {
           const uuid = this.history[0].uuid
+          const title = this.history[0].title
           this.active = uuid
+          this.activeTitle = title
           this.reloadRoute(uuid)
         }
       }
 
       if (index > this.history.length) {
         const uuid = this.history[this.history.length - 1].uuid
+        const title = this.history[this.history.length - 1].title
         this.active = uuid
+        this.activeTitle = title
         this.reloadRoute(uuid)
       }
     },
 
-    async setActive(uuid: number) {
+    async setActive(uuid: number, title: string) {
       this.active = uuid
+      this.activeTitle = title
       return await this.reloadRoute(uuid)
     },
 
@@ -99,11 +131,12 @@ export const useChatStore = defineStore('chat-store', {
           this.history.push({ uuid, title: chat.text, isEdit: false })
           this.chat.push({ uuid, data: [chat] })
           this.active = uuid
+          this.activeTitle = chat.text
           this.recordState()
         }
         else {
           this.chat[0].data.push(chat)
-          if (this.history[0].title === 'New Chat')
+          if (this.history[0].title === t('chat.newChatTitle'))
             this.history[0].title = chat.text
           this.recordState()
         }
@@ -112,7 +145,7 @@ export const useChatStore = defineStore('chat-store', {
       const index = this.chat.findIndex(item => item.uuid === uuid)
       if (index !== -1) {
         this.chat[index].data.push(chat)
-        if (this.history[index].title === 'New Chat')
+        if (this.history[index].title === t('chat.newChatTitle'))
           this.history[index].title = chat.text
         this.recordState()
       }
@@ -188,12 +221,19 @@ export const useChatStore = defineStore('chat-store', {
     },
 
     async reloadRoute(uuid?: number) {
-      this.recordState()
       await router.push({ name: 'Chat', params: { uuid } })
+      this.recordState()
     },
 
     recordState() {
       setLocalState(this.$state)
     },
+
+    recordServerState() {
+      setServerState(this.$state)
+    }
   },
+
+  
 })
+

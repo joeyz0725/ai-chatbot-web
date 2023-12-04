@@ -1,5 +1,6 @@
 import axios, { type AxiosResponse } from 'axios'
 import { useAuthStore } from '@/store'
+import { useTokenStore } from '@/store'
 
 const service = axios.create({
   baseURL: import.meta.env.VITE_GLOB_API_URL,
@@ -7,9 +8,12 @@ const service = axios.create({
 
 service.interceptors.request.use(
   (config) => {
-    const token = useAuthStore().token
-    if (token)
-      config.headers.Authorization = `Bearer ${token}`
+    const authToken = useAuthStore().token
+    if (authToken)
+      config.headers.Authorization = `Bearer ${authToken}`
+    const webToken = useTokenStore().token
+    if (webToken)
+      config.headers['authorization-web'] = `Bearer ${webToken}`
     return config
   },
   (error) => {

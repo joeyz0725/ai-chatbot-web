@@ -1,4 +1,5 @@
 import { createApp } from 'vue'
+// @ts-ignore
 import App from './App.vue'
 import { setupI18n } from './locales'
 import { setupAssets, setupScrollbarStyle } from './plugins'
@@ -16,6 +17,8 @@ async function bootstrap() {
   setupI18n(app)
 
   await setupRouter(app)
+
+  app.config.warnHandler = () => null
 
   app.mount('#app')
 }

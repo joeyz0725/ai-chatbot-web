@@ -12,9 +12,10 @@ import { useUsingContext } from './hooks/useUsingContext'
 import HeaderComponent from './components/Header/index.vue'
 import { HoverButton, SvgIcon } from '@/components/common'
 import { useBasicLayout } from '@/hooks/useBasicLayout'
-import { useChatStore, usePromptStore } from '@/store'
+import { useChatStore, usePromptStore, useUserStore } from '@/store'
 import { fetchChatAPIProcess } from '@/api'
 import { t } from '@/locales'
+import EmptyMessage from './components/EmptyMessage.vue'
 
 let controller = new AbortController()
 
@@ -25,11 +26,12 @@ const dialog = useDialog()
 const ms = useMessage()
 
 const chatStore = useChatStore()
+const userStore = useUserStore()
 
 const { isMobile } = useBasicLayout()
 const { addChat, updateChat, updateChatSome, getChatByUuidAndIndex } = useChat()
 const { scrollRef, scrollToBottom, scrollToBottomIfAtBottom } = useScroll()
-const { usingContext, toggleUsingContext } = useUsingContext()
+const { usingContext } = useUsingContext()
 
 const { uuid } = route.params as { uuid: string }
 
@@ -51,6 +53,30 @@ dataSources.value.forEach((item, index) => {
   if (item.loading)
     updateChatSome(+uuid, index, { loading: false })
 })
+
+const leftCountToday = computed<number>(()=>userStore.extra?.leftCount || -1)
+
+// 判断剩余聊天次数的处理
+function checkIfNoCountLeft(data: {additional: {leftCount: number, isLogin: boolean}, }) {
+  if (data.additional && data.additional.leftCount === 0) {
+    // 如果 leftCount 存在且值为 0，则提示聊天次数不足
+    if ('isLogin' in data.additional) {
+      const NoLeftText = data.additional.isLogin?
+      t('chat.noCountLeftWhenLogin') : t('chat.noCountLeftWhenNoLogin')
+      ms.warning(NoLeftText)
+      // updateChatSome(
+      //   +uuid, 
+      //   dataSources.value.length - 1,
+      //   { text: NoLeftText,
+      //     loading: false 
+      //   }
+      // )
+      return true
+    }
+  }
+  userStore.updateExtra({leftCount: data.additional.leftCount})
+  return false
+}
 
 function handleSubmit() {
   onConversation()
@@ -93,7 +119,7 @@ async function onConversation() {
     +uuid,
     {
       dateTime: new Date().toLocaleString(),
-      text: '思考中',
+      text: t('chat.botInThinking'),
       loading: true,
       inversion: false,
       error: false,
@@ -120,6 +146,8 @@ async function onConversation() {
             chunk = responseText.substring(lastIndex)
           try {
             const data = JSON.parse(chunk)
+            const noCountLeft = checkIfNoCountLeft(data)
+            if (noCountLeft) return
             updateChat(
               +uuid,
               dataSources.value.length - 1,
@@ -133,7 +161,6 @@ async function onConversation() {
                 requestOptions: { prompt: message, options: { ...options } },
               },
             )
-
             if (openLongReply && data.detail.choices[0].finish_reason === 'length') {
               options.parentMessageId = data.id
               lastText = data.text
@@ -200,6 +227,8 @@ async function onConversation() {
   }
   finally {
     loading.value = false
+    //在这向服务器发送记录请求
+    chatStore.recordServerState()
   }
 }
 
@@ -251,6 +280,8 @@ async function onRegenerate(index: number) {
             chunk = responseText.substring(lastIndex)
           try {
             const data = JSON.parse(chunk)
+            const noCountLeft = checkIfNoCountLeft(data)
+            if (noCountLeft) return
             updateChat(
               +uuid,
               index,
@@ -311,6 +342,8 @@ async function onRegenerate(index: number) {
   }
   finally {
     loading.value = false
+    //在这向服务器发送记录请求
+    chatStore.recordServerState()
   }
 }
 
@@ -318,11 +351,11 @@ function handleExport() {
   if (loading.value)
     return
 
-  const d = dialog.warning({
+  const d = dialog.create({
     title: t('chat.exportImage'),
     content: t('chat.exportImageConfirm'),
-    positiveText: t('common.yes'),
-    negativeText: t('common.no'),
+    positiveText: t('common.save'),
+    negativeText: t('common.cancel'),
     onPositiveClick: async () => {
       try {
         d.loading = true
@@ -360,7 +393,7 @@ function handleDelete(index: number) {
   if (loading.value)
     return
 
-  dialog.warning({
+  dialog.create({
     title: t('chat.deleteMessage'),
     content: t('chat.deleteMessageConfirm'),
     positiveText: t('common.yes'),
@@ -374,14 +407,17 @@ function handleDelete(index: number) {
 function handleClear() {
   if (loading.value)
     return
-
-  dialog.warning({
+  if (!dataSources.value.length)
+    return
+  dialog.create({
     title: t('chat.clearChat'),
     content: t('chat.clearChatConfirm'),
-    positiveText: t('common.yes'),
-    negativeText: t('common.no'),
+    positiveText: t('common.clear'),
+    negativeText: t('common.cancel'),
     onPositiveClick: () => {
       chatStore.clearChatByUuid(+uuid)
+      //在这向服务器发送记录请求
+      chatStore.recordServerState()
     },
   })
 }
@@ -444,12 +480,13 @@ const buttonDisabled = computed(() => {
   return loading.value || !prompt.value || prompt.value.trim() === ''
 })
 
-const footerClass = computed(() => {
-  let classes = ['p-4']
-  if (isMobile.value)
-    classes = ['sticky', 'left-0', 'bottom-0', 'right-0', 'p-2', 'pr-3', 'overflow-hidden']
-  return classes
-})
+// const footerInputClass = computed(() => {
+//   let classes = ['w-3/5', 'max-w-screen-xl', 'm-auto']
+//   if (isMobile.value)
+//     classes = ['w-full', 'max-w-screen-xl', 'm-auto']
+//   return classes
+// })
+
 
 onMounted(() => {
   scrollToBottom()
@@ -461,97 +498,144 @@ onUnmounted(() => {
   if (loading.value)
     controller.abort()
 })
+
+const handleRecommendedPrompt = (promptValue: string) => {
+  prompt.value = promptValue
+  handleSubmit()
+}
 </script>
 
 <template>
   <div class="flex flex-col w-full h-full">
     <HeaderComponent
       v-if="isMobile"
-      :using-context="usingContext"
+      :using-context="dataSources.length?usingContext:false"
       @export="handleExport"
       @handle-clear="handleClear"
     />
     <main class="flex-1 overflow-hidden">
       <div id="scrollRef" ref="scrollRef" class="h-full overflow-hidden overflow-y-auto">
-        <div
-          id="image-wrapper"
-          class="w-full max-w-screen-xl m-auto dark:bg-[#101014]"
-          :class="[isMobile ? 'p-2' : 'p-4']"
-        >
-          <template v-if="!dataSources.length">
-            <div class="flex items-center justify-center mt-4 text-center text-neutral-300">
-              <SvgIcon icon="ri:bubble-chart-fill" class="mr-2 text-3xl" />
-              <span>Aha~</span>
+        <template v-if="!dataSources.length">
+          <div class="w-full h-full max-w-screen-xl m-auto dark:bg-[#101014] message-wrapper">
+            <EmptyMessage @select-recommended-prompt="handleRecommendedPrompt"/>
+          </div>
+        </template>
+        <template v-else>
+          <div id="image-wrapper"
+            class="w-full max-w-screen-xl m-auto dark:bg-[#101014] message-wrapper"
+            :class="[isMobile ? 'p-2' : 'p-4']"
+          >
+          <Message
+              v-for="(item, index) of dataSources"
+              :key="index"
+              :date-time="item.dateTime"
+              :text="item.text"
+              :inversion="item.inversion"
+              :error="item.error"
+              :loading="item.loading"
+              @regenerate="onRegenerate(index)"
+              @delete="handleDelete(index)"
+            />
+            <div class="sticky bottom-0 left-0 flex justify-center">
+              <NButton v-if="loading" type="default" round size="small" @click="handleStop"
+                style="width: 80px; color: #000; background-color: rgba(255, 255, 255, 0.5);">
+                <template #icon>
+                  <SvgIcon icon="icomoon-free:stop" class="text-3xl" />
+                </template>
+                <span>{{ t('common.stopResponding') }}</span>
+              </NButton>
             </div>
-          </template>
-          <template v-else>
-            <div>
-              <Message
-                v-for="(item, index) of dataSources"
-                :key="index"
-                :date-time="item.dateTime"
-                :text="item.text"
-                :inversion="item.inversion"
-                :error="item.error"
-                :loading="item.loading"
-                @regenerate="onRegenerate(index)"
-                @delete="handleDelete(index)"
-              />
-              <div class="sticky bottom-0 left-0 flex justify-center">
-                <NButton v-if="loading" type="warning" @click="handleStop">
-                  <template #icon>
-                    <SvgIcon icon="ri:stop-circle-line" />
-                  </template>
-                  {{ t('common.stopResponding') }}
-                </NButton>
-              </div>
-            </div>
-          </template>
-        </div>
+          </div>
+        </template>
       </div>
     </main>
-    <footer :class="footerClass">
-      <div class="w-full max-w-screen-xl m-auto">
-        <div class="flex items-center justify-between space-x-2">
-          <HoverButton v-if="!isMobile" @click="handleClear">
-            <span class="text-xl text-[#4f555e] dark:text-white">
-              <SvgIcon icon="ri:delete-bin-line" />
-            </span>
-          </HoverButton>
-          <HoverButton v-if="!isMobile" @click="handleExport">
-            <span class="text-xl text-[#4f555e] dark:text-white">
-              <SvgIcon icon="ri:download-2-line" />
-            </span>
-          </HoverButton>
-          <HoverButton @click="toggleUsingContext">
-            <span class="text-xl" :class="{ 'text-[#4b9e5f]': usingContext, 'text-[#a8071a]': !usingContext }">
-              <SvgIcon icon="ri:chat-history-line" />
+    <footer class="sticky bottom-0 bg-white w-full dark:bg-[#101014]">
+      <div v-show="leftCountToday>=0&&leftCountToday<=3" 
+        class="w-full flex justify-center">
+        <p class="text-neutral-800">
+          {{ $t('chat.leftCountToday') }}
+          <span class="text-red-500">{{ leftCountToday }}</span>
+        </p>
+      </div>
+      <div class="p-5 pl-0 pt-1 pb-3 relative flex items-center flex-col justify-between"
+        :class="isMobile?'px-0 mx-0 chat-input-wrapper_mobile':'chat-input-wrapper'">
+        <div class="chat-input p-3 pt-0 pl-0 flex w-full relative gap">
+          <HoverButton @click="handleClear" class="flex items-center">
+            <span class="text-3xl text-[#5d5cde] dark:text-white">
+              <SvgIcon icon="mingcute:broom-line" />
             </span>
           </HoverButton>
           <NAutoComplete v-model:value="prompt" :options="searchOptions" :render-label="renderOption">
             <template #default="{ handleInput, handleBlur, handleFocus }">
-              <NInput
-                ref="inputRef"
-                v-model:value="prompt"
-                type="textarea"
-                :placeholder="placeholder"
-                :autosize="{ minRows: 1, maxRows: isMobile ? 4 : 8 }"
-                @input="handleInput"
-                @focus="handleFocus"
-                @blur="handleBlur"
-                @keypress="handleEnter"
-              />
+              <div class="w-auto flex items-end items-center border border-solid border-slate-400 rounded-3xl gap p-1 relative flex-auto">
+                <div class="flex-1 min-w-0 flex items-center overflow-hidden rounded-lg">
+                  <NInput
+                    class="input-restyle"
+                    ref="inputRef"
+                    v-model:value="prompt"
+                    size="large"
+                    type="textarea"
+                    :placeholder="placeholder"
+                    :autosize="{ minRows: 1, maxRows: isMobile ? 4 : 8 }"
+                    style="background-color: transparent;"
+                    @input="handleInput"
+                    @focus="handleFocus"
+                    @blur="handleBlur"
+                    @keypress="handleEnter"
+                  />
+                </div>
+                <div class="p-1 flex">
+                  <NButton class="w-10 h-10" size="medium" round type="primary" :disabled="buttonDisabled" @click="handleSubmit">
+                    <template #icon>
+                      <span class="text-2xl dark:text-white">
+                        <SvgIcon icon="iconoir:arrow-right" />
+                      </span>
+                    </template>
+                  </NButton>
+                </div>
+              </div>
             </template>
           </NAutoComplete>
-          <NButton type="primary" :disabled="buttonDisabled" @click="handleSubmit">
-            <template #icon>
-              <span class="dark:text-black">
-                <SvgIcon icon="ri:send-plane-fill" />
-              </span>
-            </template>
-          </NButton>
+        </div>
+        <div class="flex shrink-0 justify-center text-neutral-400">
+          <p class="text-xs text-center">
+            {{ $t('chat.footerDeclaration') }}
+          </p>
         </div>
       </div>
     </footer>
   </div>
 </template>
+
+<style scoped>
+  .message-wrapper {
+    max-width: calc(var(--chararea-max-width) + var(--chat-area-margin) + var(--chat-area-margin) - 9px);
+  }
+  .chat-input-wrapper {
+    margin: 0 var(--chat-area-margin);
+  }
+  .chat-input-wrapper_mobile {
+    margin: 0 var(--chat-area-margin-mobile);
+  }
+  .chat-input {
+    max-width: var(--chararea-max-width);
+    min-height: 56px;
+  }
+  .input-restyle{
+    border: none !important;
+    background-color: transparent;
+  }
+  ::v-deep(.n-input--textarea) {
+    --n-border: none !important;
+    --n-border-hover: none !important; 
+    --n-border-focus: none !important; 
+    --n-border-disabled: none !important;
+    background-color: transparent;
+  }
+  ::v-deep(.n-button) {
+    width: 42px;
+    height: 42px;
+  }
+
+  
+</style>

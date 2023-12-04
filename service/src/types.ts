@@ -31,4 +31,10 @@ export interface ModelConfig {
   usage?: string
 }
 
+export const MaxMessageCount = {
+  GUEST: 5,
+  USER: 20,
+  VIP: -1
+}
+
 export type ApiModel = 'ChatGPTAPI' | 'ChatGPTUnofficialProxyAPI' | undefined

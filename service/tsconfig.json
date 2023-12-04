@@ -15,7 +15,13 @@
     "isolatedModules": true,
     "baseUrl": ".",
     "outDir": "build",
-    "noEmit": true
+    "noEmit": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+    "types": ["express", "jsonwebtoken"]
   },
   "exclude": [
     "node_modules",

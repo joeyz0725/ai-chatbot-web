@@ -1,0 +1,166 @@
+<script setup lang="ts">
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { NForm, NFormItem, NInput, NButton, 
+    NAvatar, useMessage, FormInst  } from 'naive-ui'
+import defaultAvatar from '@/assets/profile-pic.png'
+import { useUserStore, useChatStore } from '@/store'
+import { t } from '@/locales'
+import { useBasicLayout } from '@/hooks/useBasicLayout'
+import HeaderComponent from '../chat/components/Header/index.vue'
+import { HoverButton, SvgIcon } from '@/components/common'
+import { saveUserAPI } from '@/api/user'
+// @ts-ignore
+import VueToyFace from "vue-toy-face";
+import AvatarSelector from './AvatarSelector.vue'
+import { splitAndCombine } from '@/utils/functions'
+
+
+const router = useRouter()
+const { isMobile } = useBasicLayout()
+const usertore = useUserStore()
+const chatStore = useChatStore()
+
+const formRef = ref<FormInst | null>(null)
+const userInfo = ref({
+  avatar: usertore.userInfo?.avatar ?? defaultAvatar,
+  name: usertore.userInfo?.name ?? '',
+  description: usertore.userInfo?.description ?? ''
+})
+const avatarGroup = ref<number>(splitAndCombine(userInfo.value.avatar)[0] || 1)
+const avatarNumber = ref<number>(splitAndCombine(userInfo.value.avatar)[1] || 1)
+
+const message = useMessage()
+
+const formRules = {
+  name: [{
+      key: 'name',
+      required: true,
+      trigger: ['blur'],
+      message: t('setting.nameEmptywarning')
+    },  {
+      key: 'name',
+      max: 15,
+      trigger: ['blur'],
+      message: t('setting.nameExceedwarning')
+    }
+  ],
+  description: {
+    key: 'description',
+    max: 200,
+    trigger: ['blur'],
+    message: t('setting.dscriptionExceedwarning')
+  }
+}
+
+const handleSave = function(e: Event) {
+  e.preventDefault()
+  formRef.value?.validate((errors) => {
+    if (!errors) {
+      saveUserAPI(userInfo.value).then(response=>response.data).then(data=>{
+        if (data.success){
+          usertore.updateUserInfo(userInfo.value)
+          message.success(t('common.saveSuccess'), {
+            duration: 1000,
+            onAfterLeave: ()=>{
+              chatStore.reloadRoute()
+            }
+          })
+        }
+      })
+    }
+  })
+}
+
+const handleBack = function() {
+  router.go(-1);
+}
+
+const modalShow = ref<boolean>(false)
+const showModal = function() {
+  modalShow.value = true
+}
+const hideModal = function() {
+  modalShow.value = false
+}
+
+const changeAvatar = function (position: string){
+  userInfo.value.avatar = position
+  avatarGroup.value = splitAndCombine(position)[0]
+  avatarNumber.value = splitAndCombine(position)[1]
+}
+
+const overlayShow = ref<boolean>(false)
+const showOverlay = function(isShow: boolean) {
+  overlayShow.value = isShow
+}
+</script>
+
+<template>
+  <div class="w-full h-full">
+    <HeaderComponent
+      v-if="isMobile"
+      :using-context="false"
+    />
+    <div class="flex flex-col max-w-screen-xl gap-6 my-0 mx-auto">
+      <div>
+        <div class="flex justify-center items-center p-5">
+          <HoverButton @click="handleBack" class="flex items-center">
+            <span class="text-2xl dark:text-white">
+              <SvgIcon icon="uiw:left" />
+            </span>
+          </HoverButton>
+          <h2 class="text-lg font-semibold flex-grow text-center mr-11">{{ $t('setting.profileTitle') }}</h2>
+        </div>
+      </div>
+      <div>
+        <NForm ref="formRef" :model="userInfo" :rules="formRules" size="large"
+          class="flex flex-col justify-center items-center">
+          <div class="flex justify-center items-center">
+            <button @click="showModal" class="flex m-2 relative"
+                @mouseover="showOverlay(true)" @mouseout="showOverlay(false)">
+              <template v-if="userInfo.avatar && userInfo.avatar.length>0">
+                <VueToyFace size="80" rounded="80" style="margin:0;"
+                  :group="avatarGroup" :toy-number="avatarNumber">
+                </VueToyFace>
+              </template>
+              <template v-else>
+                <NAvatar :src="defaultAvatar">
+                </NAvatar>
+              </template>
+              <div v-show="overlayShow" class="absolute top-0 left-0 rounded-full
+                w-full h-full bg-black bg-opacity-50 flex justify-center items-center">
+                <SvgIcon class="text-xl text-white" icon="iconoir:profile-circle" />
+              </div>
+            </button>
+          </div>
+          <div class="w-2/5 flex flex-col gap-2"
+                :class="isMobile?'w-4/5':'w-3/5 max-w-lg'">
+            <NFormItem
+              :label="$t('setting.name')"
+              path="name">
+              <NInput v-model:value="userInfo.name" path="formRules.name" :placeholder="$t('setting.namePlaceholder')"/>
+            </NFormItem>
+            <NFormItem :label="$t('setting.description')" path="description">
+              <NInput v-model:value="userInfo.description" path="formRules.description" :placeholder="$t('setting.dscriptionExceedwarning')" 
+                type="textarea" :autosize="{ minRows: 5, maxRows: 8 }"/>
+            </NFormItem>
+            <div class="grid grid-flow-col justify-stretch">
+              <n-button type="primary" @click="handleSave"
+                style="height: 48px; border-radius: 16px; color: #fff">
+                {{ $t('common.save') }}
+              </n-button>
+            </div>
+          </div>
+        </NForm>
+      </div>
+    </div>
+    <AvatarSelector :visible="modalShow" @close="hideModal" @change="changeAvatar"/>
+  </div>
+</template>
+
+<style scoped>
+  ::v-deep(.n-upload-trigger){
+    display: flex;
+  }
+</style>

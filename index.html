@@ -7,7 +7,7 @@
 	<link rel="apple-touch-icon" href="/favicon.ico">
 	<meta name="viewport"
 		content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, viewport-fit=cover" />
-	<title>ChatGPT Web</title>
+	<title>奇小宝 - 和原生ChatGPT畅聊</title>
 </head>
 
 <body class="dark:bg-black">
@@ -19,62 +19,61 @@
 				align-items: center;
 				height: 100vh;
 			}
-
-			.balls {
-				width: 4em;
-				display: flex;
-				flex-flow: row nowrap;
-				align-items: center;
-				justify-content: space-between;
+			@keyframes ldio-hu20b77sk7p-1 {
+				0% { top: 16.4px; height: 67.2px }
+				50% { top: 29px; height: 42px }
+				100% { top: 29px; height: 42px }
 			}
-
-			.balls div {
-				width: 0.8em;
-				height: 0.8em;
-				border-radius: 50%;
-				background-color: #4b9e5f;
+			@keyframes ldio-hu20b77sk7p-2 {
+				0% { top: 19.549999999999997px; height: 60.900000000000006px }
+				50% { top: 29px; height: 42px }
+				100% { top: 29px; height: 42px }
 			}
-
-			.balls div:nth-of-type(1) {
-				transform: translateX(-100%);
-				animation: left-swing 0.5s ease-in alternate infinite;
+			@keyframes ldio-hu20b77sk7p-3 {
+				0% { top: 22.7px; height: 54.6px }
+				50% { top: 29px; height: 42px }
+				100% { top: 29px; height: 42px }
 			}
-
-			.balls div:nth-of-type(3) {
-				transform: translateX(-95%);
-				animation: right-swing 0.5s ease-out alternate infinite;
+			.ldio-hu20b77sk7p div { position: absolute; width: 15px }.ldio-hu20b77sk7p div:nth-child(1) {
+				left: 17.5px;
+				background: #5d5cde;
+				animation: ldio-hu20b77sk7p-1 1s cubic-bezier(0,0.5,0.5,1) infinite;
+				animation-delay: -0.2s
 			}
-
-			@keyframes left-swing {
-
-				50%,
-				100% {
-					transform: translateX(95%);
-				}
+			.ldio-hu20b77sk7p div:nth-child(2) {
+				left: 42.5px;
+				background: #b641fa;
+				animation: ldio-hu20b77sk7p-2 1s cubic-bezier(0,0.5,0.5,1) infinite;
+				animation-delay: -0.1s
 			}
-
-			@keyframes right-swing {
-				50% {
-					transform: translateX(-95%);
-				}
-
-				100% {
-					transform: translateX(100%);
-				}
+			.ldio-hu20b77sk7p div:nth-child(3) {
+				left: 67.5px;
+				background: #aeadee;
+				animation: ldio-hu20b77sk7p-3 1s cubic-bezier(0,0.5,0.5,1) infinite;
+				animation-delay: undefineds
 			}
-
-			@media (prefers-color-scheme: dark) {
-				body {
-					background: #121212;
-				}
+			
+			.loadingio-spinner-pulse-7jzygg6rrhd {
+				width: 100px;
+				height: 100px;
+				display: inline-block;
+				overflow: hidden;
+				background: none;
 			}
+			.ldio-hu20b77sk7p {
+				width: 100%;
+				height: 100%;
+				position: relative;
+				transform: translateZ(0) scale(1);
+				backface-visibility: hidden;
+				transform-origin: 0 0; /* see note above */
+			}
+			.ldio-hu20b77sk7p div { box-sizing: content-box; }
 		</style>
 		<div class="loading-wrap">
-			<div class="balls">
-				<div></div>
-				<div></div>
-				<div></div>
-			</div>
+			<div class="loadingio-spinner-pulse-7jzygg6rrhd"><div class="ldio-hu20b77sk7p">
+			<div></div><div></div><div></div>
+			</div></div>
 		</div>
 	</div>
 	<script type="module" src="/src/main.ts"></script>

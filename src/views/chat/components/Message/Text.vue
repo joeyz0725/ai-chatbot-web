@@ -44,10 +44,13 @@ const wrapClass = computed(() => {
     'min-w-[20px]',
     'rounded-md',
     isMobile.value ? 'p-2' : 'px-3 py-2',
-    props.inversion ? 'bg-[#d2f9d1]' : 'bg-[#f4f6f8]',
-    props.inversion ? 'dark:bg-[#a1dc95]' : 'dark:bg-[#1e1e20]',
+    props.inversion ? 'bg-[#5d5ce0]' : 'bg-[#f7f7f7]',
+    props.inversion ? 'dark:bg-[#5d5cde]' : 'dark:bg-[#1e1e20]',
     props.inversion ? 'message-request' : 'message-reply',
     { 'text-red-500': props.error },
+    'w-full',
+    'whitespace-nowrap',
+    'overflow-x-auto'
   ]
 })
 
@@ -70,9 +73,9 @@ function addCopyEvents() {
         const code = btn.parentElement?.nextElementSibling?.textContent
         if (code) {
           copyToClip(code).then(() => {
-            btn.textContent = '复制成功'
+            btn.textContent = t('chat.copied')
             setTimeout(() => {
-              btn.textContent = '复制代码'
+              btn.textContent = t('chat.copyCode')
             }, 1000)
           })
         }
@@ -104,7 +107,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="text-black" :class="wrapClass">
+  <div class="text-white" :class="wrapClass">
     <div ref="textRef" class="leading-relaxed break-words">
       <div v-if="!inversion">
         <div v-if="!asRawText" class="markdown-body" :class="{ 'markdown-body-generate': loading }" v-html="text" />
