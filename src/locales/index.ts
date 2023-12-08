@@ -27,7 +27,7 @@ const i18n = createI18n({
     'ru-RU': ruRU,
     'ja-JP': jaJP,
     'fr-FR': frFR,
-    'es-AR': esAR
+    'es-AR': esAR,
   },
 })
 

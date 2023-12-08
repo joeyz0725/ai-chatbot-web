@@ -1,11 +1,11 @@
 <script setup lang='ts'>
 import { computed, ref } from 'vue'
 import { NScrollbar } from 'naive-ui'
-import { SvgIcon, ChatRecord } from '@/components/common'
+import { ChatRecord, SvgIcon } from '@/components/common'
 import MenuModal from '@/components/common/ChatRecord/MenuModal.vue'
 import { useChatStore } from '@/store'
 
-interface activeItem {
+interface ActiveItem {
   uuid: number
   title: string
   isEdit: boolean
@@ -14,8 +14,9 @@ interface activeItem {
 
 const chatStore = useChatStore()
 const dataSources = computed(() => chatStore.history)
-const activeHistory = chatStore?.getHistoryAndIndexByCurrentActive || null
-const activeItem = ref<activeItem>({
+const activeHistoryFunction = chatStore?.getHistoryAndIndexByCurrentActive || null
+const activeHistory = activeHistoryFunction as ActiveItem
+const activeItem = ref<ActiveItem>({
   uuid: activeHistory?.uuid,
   title: activeHistory?.title,
   isEdit: activeHistory?.isEdit,
@@ -41,17 +42,21 @@ const showDelModal = ref<boolean>(false)
                因为v-model:showEditModal="showEditModal"的双向绑定，改变了
                showEditModal的值，从而触发下面第4步的双向绑定
           -->
-          <ChatRecord :item="item" :index="index"
-                      v-model:activeItem="activeItem"
-                      v-model:showEditModal="showEditModal"
-                      v-model:showDelModal="showDelModal"/>
+          <ChatRecord
+            v-model:activeItem="activeItem" v-model:showEditModal="showEditModal"
+            v-model:showDelModal="showDelModal"
+            :item="item"
+            :index="index"
+          />
         </div>
       </template>
     </div>
     <!-- 第4步：由于前面第3步中将showEditModal变量改变了，这里又双向绑定了
          MenuModal组件中的showEditModal值，所以又会触发一次，跳到第5步
     -->
-    <MenuModal v-model:showEditModal="showEditModal" v-model:showDelModal="showDelModal"
-               v-model:activeItem="activeItem" />
+    <MenuModal
+      v-model:showEditModal="showEditModal" v-model:showDelModal="showDelModal"
+      v-model:activeItem="activeItem"
+    />
   </NScrollbar>
 </template>

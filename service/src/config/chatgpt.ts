@@ -1,6 +1,6 @@
 import * as dotenv from 'dotenv'
-import { GptState } from '@/types'
-import { ConfigService } from '../services/ConfigService';
+import { ConfigService } from '../services/ConfigService'
+import type { GptState } from '@/types'
 
 dotenv.config()
 
@@ -9,21 +9,21 @@ const nullGptState = {
   openaiAddress: '',
   openaiApiKey: '',
   reverseProxyAddress: '',
-  accessToken: ''
+  accessToken: '',
 }
 class ChatGptConfig {
   private gptState: GptState | null
   private configService: ConfigService
 
   constructor() {
-    this.gptState = nullGptState as any;
-    this.configService = new ConfigService();
+    this.gptState = nullGptState as any
+    this.configService = new ConfigService()
   }
 
   public async initializeGptState(userId: number): Promise<void> {
     // 根据 userId 从数据库中获取相应的配置值
-    const result = await this.configService.findOrCreateGptConfig(userId);
-    if (result.success){
+    const result = await this.configService.findOrCreateGptConfig(userId)
+    if (result.success) {
       // 根据 userConfig 初始化 gptState 对象
       const gptConfig = result.data
       this.gptState = {
@@ -46,12 +46,12 @@ class ChatGptConfig {
 
   public destroyGptState(): void {
     // 在这里执行销毁操作，例如将 gptState 对象置为 null
-    this.gptState = nullGptState as any;
+    this.gptState = nullGptState as any
   }
 
   public getGptState(): GptState | null {
-    return this.gptState;
+    return this.gptState
   }
 }
 
-export const chatGptConfig = new ChatGptConfig();
+export const chatGptConfig = new ChatGptConfig()

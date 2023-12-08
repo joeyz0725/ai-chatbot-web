@@ -56,7 +56,7 @@ export default defineConfig((env) => {
       },
     },
     optimizeDeps: {
-      exclude: ['vue-toy-face']
-    }
+      exclude: ['vue-toy-face'],
+    },
   }
 })

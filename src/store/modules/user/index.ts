@@ -1,4 +1,3 @@
-
 // 导入 `defineStore` 函数，用于创建 Pinia store
 import { defineStore } from 'pinia'
 // 导入类型，这些类型定义在 './helper' 模块中
@@ -60,7 +59,6 @@ export const useUserStore = defineStore('user-store', {
     recordState() {
       // 调用设置本地状态的函数，传入当前 store 的状态
       setLocalState(this.$state)
-    }
+    },
   },
 })
-

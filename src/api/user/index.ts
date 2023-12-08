@@ -15,5 +15,5 @@ export function fetchVisitorAPI() {
 }
 
 export function saveUserAPI(userInfo: UserInfo) {
-  return myAxios.post('/user/save-user', { userInfo: userInfo })
+  return myAxios.post('/user/save-user', { userInfo })
 }

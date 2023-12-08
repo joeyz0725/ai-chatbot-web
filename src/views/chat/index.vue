@@ -10,12 +10,12 @@ import { useScroll } from './hooks/useScroll'
 import { useChat } from './hooks/useChat'
 import { useUsingContext } from './hooks/useUsingContext'
 import HeaderComponent from './components/Header/index.vue'
+import EmptyMessage from './components/EmptyMessage.vue'
 import { HoverButton, SvgIcon } from '@/components/common'
 import { useBasicLayout } from '@/hooks/useBasicLayout'
 import { useChatStore, usePromptStore, useUserStore } from '@/store'
 import { fetchChatAPIProcess } from '@/api'
 import { t } from '@/locales'
-import EmptyMessage from './components/EmptyMessage.vue'
 
 let controller = new AbortController()
 
@@ -54,27 +54,28 @@ dataSources.value.forEach((item, index) => {
     updateChatSome(+uuid, index, { loading: false })
 })
 
-const leftCountToday = computed<number>(()=>userStore.extra?.leftCount || -1)
+const leftCountToday = computed<number>(() => userStore.extra?.leftCount || -1)
 
 // 判断剩余聊天次数的处理
-function checkIfNoCountLeft(data: {additional: {leftCount: number, isLogin: boolean}, }) {
+function checkIfNoCountLeft(data: { additional: { leftCount: number; isLogin: boolean } }) {
   if (data.additional && data.additional.leftCount === 0) {
     // 如果 leftCount 存在且值为 0，则提示聊天次数不足
     if ('isLogin' in data.additional) {
-      const NoLeftText = data.additional.isLogin?
-      t('chat.noCountLeftWhenLogin') : t('chat.noCountLeftWhenNoLogin')
+      const NoLeftText = data.additional.isLogin
+        ? t('chat.noCountLeftWhenLogin')
+        : t('chat.noCountLeftWhenNoLogin')
       ms.warning(NoLeftText)
       // updateChatSome(
-      //   +uuid, 
+      //   +uuid,
       //   dataSources.value.length - 1,
       //   { text: NoLeftText,
-      //     loading: false 
+      //     loading: false
       //   }
       // )
       return true
     }
   }
-  userStore.updateExtra({leftCount: data.additional.leftCount})
+  userStore.updateExtra({ leftCount: data.additional.leftCount })
   return false
 }
 
@@ -147,7 +148,8 @@ async function onConversation() {
           try {
             const data = JSON.parse(chunk)
             const noCountLeft = checkIfNoCountLeft(data)
-            if (noCountLeft) return
+            if (noCountLeft)
+              return
             updateChat(
               +uuid,
               dataSources.value.length - 1,
@@ -227,7 +229,7 @@ async function onConversation() {
   }
   finally {
     loading.value = false
-    //在这向服务器发送记录请求
+    // 在这向服务器发送记录请求
     chatStore.recordServerState()
   }
 }
@@ -281,7 +283,8 @@ async function onRegenerate(index: number) {
           try {
             const data = JSON.parse(chunk)
             const noCountLeft = checkIfNoCountLeft(data)
-            if (noCountLeft) return
+            if (noCountLeft)
+              return
             updateChat(
               +uuid,
               index,
@@ -342,7 +345,7 @@ async function onRegenerate(index: number) {
   }
   finally {
     loading.value = false
-    //在这向服务器发送记录请求
+    // 在这向服务器发送记录请求
     chatStore.recordServerState()
   }
 }
@@ -416,7 +419,7 @@ function handleClear() {
     negativeText: t('common.cancel'),
     onPositiveClick: () => {
       chatStore.clearChatByUuid(+uuid)
-      //在这向服务器发送记录请求
+      // 在这向服务器发送记录请求
       chatStore.recordServerState()
     },
   })
@@ -487,7 +490,6 @@ const buttonDisabled = computed(() => {
 //   return classes
 // })
 
-
 onMounted(() => {
   scrollToBottom()
   if (inputRef.value && !isMobile.value)
@@ -509,7 +511,7 @@ const handleRecommendedPrompt = (promptValue: string) => {
   <div class="flex flex-col w-full h-full">
     <HeaderComponent
       v-if="isMobile"
-      :using-context="dataSources.length?usingContext:false"
+      :using-context="dataSources.length ? usingContext : false"
       @export="handleExport"
       @handle-clear="handleClear"
     />
@@ -517,15 +519,16 @@ const handleRecommendedPrompt = (promptValue: string) => {
       <div id="scrollRef" ref="scrollRef" class="h-full overflow-hidden overflow-y-auto">
         <template v-if="!dataSources.length">
           <div class="w-full h-full max-w-screen-xl m-auto dark:bg-[#101014] message-wrapper">
-            <EmptyMessage @select-recommended-prompt="handleRecommendedPrompt"/>
+            <EmptyMessage @select-recommended-prompt="handleRecommendedPrompt" />
           </div>
         </template>
         <template v-else>
-          <div id="image-wrapper"
+          <div
+            id="image-wrapper"
             class="w-full max-w-screen-xl m-auto dark:bg-[#101014] message-wrapper"
             :class="[isMobile ? 'p-2' : 'p-4']"
           >
-          <Message
+            <Message
               v-for="(item, index) of dataSources"
               :key="index"
               :date-time="item.dateTime"
@@ -537,8 +540,10 @@ const handleRecommendedPrompt = (promptValue: string) => {
               @delete="handleDelete(index)"
             />
             <div class="sticky bottom-0 left-0 flex justify-center">
-              <NButton v-if="loading" type="default" round size="small" @click="handleStop"
-                style="width: 80px; color: #000; background-color: rgba(255, 255, 255, 0.5);">
+              <NButton
+                v-if="loading" type="default" round size="small" style="width: 80px; color: #000; background-color: rgba(255, 255, 255, 0.5);"
+                @click="handleStop"
+              >
                 <template #icon>
                   <SvgIcon icon="icomoon-free:stop" class="text-3xl" />
                 </template>
@@ -550,17 +555,21 @@ const handleRecommendedPrompt = (promptValue: string) => {
       </div>
     </main>
     <footer class="sticky bottom-0 bg-white w-full dark:bg-[#101014]">
-      <div v-show="leftCountToday>=0&&leftCountToday<=3" 
-        class="w-full flex justify-center">
+      <div
+        v-show="leftCountToday >= 0 && leftCountToday <= 3"
+        class="w-full flex justify-center"
+      >
         <p class="text-neutral-800">
           {{ $t('chat.leftCountToday') }}
           <span class="text-red-500">{{ leftCountToday }}</span>
         </p>
       </div>
-      <div class="p-5 pl-0 pt-1 pb-3 relative flex items-center flex-col justify-between"
-        :class="isMobile?'px-0 mx-0 chat-input-wrapper_mobile':'chat-input-wrapper'">
+      <div
+        class="p-5 pl-0 pt-1 pb-3 relative flex items-center flex-col justify-between"
+        :class="isMobile ? 'px-0 mx-0 chat-input-wrapper_mobile' : 'chat-input-wrapper'"
+      >
         <div class="chat-input p-3 pt-0 pl-0 flex w-full relative gap">
-          <HoverButton @click="handleClear" class="flex items-center">
+          <HoverButton class="flex items-center" @click="handleClear">
             <span class="text-3xl text-[#5d5cde] dark:text-white">
               <SvgIcon icon="mingcute:broom-line" />
             </span>
@@ -570,9 +579,9 @@ const handleRecommendedPrompt = (promptValue: string) => {
               <div class="w-auto flex items-end items-center border border-solid border-slate-400 rounded-3xl gap p-1 relative flex-auto">
                 <div class="flex-1 min-w-0 flex items-center overflow-hidden rounded-lg">
                   <NInput
-                    class="input-restyle"
                     ref="inputRef"
                     v-model:value="prompt"
+                    class="input-restyle"
                     size="large"
                     type="textarea"
                     :placeholder="placeholder"
@@ -627,8 +636,8 @@ const handleRecommendedPrompt = (promptValue: string) => {
   }
   ::v-deep(.n-input--textarea) {
     --n-border: none !important;
-    --n-border-hover: none !important; 
-    --n-border-focus: none !important; 
+    --n-border-hover: none !important;
+    --n-border-focus: none !important;
     --n-border-disabled: none !important;
     background-color: transparent;
   }
@@ -636,6 +645,4 @@ const handleRecommendedPrompt = (promptValue: string) => {
     width: 42px;
     height: 42px;
   }
-
-  
 </style>

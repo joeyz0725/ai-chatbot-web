@@ -1,8 +1,8 @@
 import type { GlobalThemeOverrides } from 'naive-ui'
 import { computed, watch } from 'vue'
 import { darkTheme, useOsTheme } from 'naive-ui'
+import { darkThemeOverrides, lightThemeOverrides } from './themeSelection'
 import { useAppStore } from '@/store'
-import { lightThemeOverrides, darkThemeOverrides } from './themeSelection'
 
 // 自定义 hook: 处理应用程序的主题切换逻辑
 export function useTheme() {
@@ -27,9 +27,9 @@ export function useTheme() {
 
   // 计算属性：根据 isDark 的值选择相应的主题覆盖
   const themeOverrides = computed<GlobalThemeOverrides>(() => {
-    if (isDark.value) {
+    if (isDark.value)
       return darkThemeOverrides
-    }
+
     return lightThemeOverrides
   })
 

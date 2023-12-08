@@ -2,9 +2,8 @@
 // 导入 Vue 3 的 Composition API 中的相关函数和模块
 import { computed, onMounted, ref } from 'vue'
 // 导入 Naive UI 中的 NSpin 组件
-import { NSpin, NH2, NH3 } from 'naive-ui'
+import { NH2, NH3, NSpin } from 'naive-ui'
 // 导入项目根目录下的 package.json 文件
-import pkg from '../../../../package.json'
 // 导入自定义的 fetchChatConfig 函数和 useAuthStore 函数
 import { fetchChatConfig } from '@/api'
 import { useAuthStore } from '@/store'
@@ -57,8 +56,12 @@ onMounted(() => {
   <NSpin :show="loading">
     <div class="p-4 space-y-4">
       <div>
-        <NH2 class="font-bold">奇小宝</NH2>
-        <NH3 class="n-text-lg">一款基于原生ChatGPT的聊天机器人</NH3>
+        <NH2 class="font-bold">
+          奇小宝
+        </NH2>
+        <NH3 class="n-text-lg">
+          一款基于原生ChatGPT的聊天机器人
+        </NH3>
       </div>
       <div class="p-2 space-y-2 rounded-md bg-neutral-100 dark:bg-neutral-700">
         <p>

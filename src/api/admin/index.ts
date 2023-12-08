@@ -7,16 +7,16 @@ interface AccountField {
 }
 
 export function createAccountAPI(user: AccountField) {
-  return myAxios.post('/admin/create-account', 
-  { user: user })
+  return myAxios.post('/admin/create-account',
+    { user })
 }
 
 export function fetchAccountsAPI(searchParams?: string) {
-  return myAxios.post('/admin/fetch-accounts', 
-  { searchParams: searchParams })
+  return myAxios.post('/admin/fetch-accounts',
+    { searchParams })
 }
 
 export function resetPasswordAPI(ids: number[]) {
-  return myAxios.post('/admin/reset-password', 
-  { ids: ids })
+  return myAxios.post('/admin/reset-password',
+    { ids })
 }

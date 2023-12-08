@@ -15,21 +15,21 @@ const routes: RouteRecordRaw[] = [
         path: '/chat/:uuid?',
         name: 'Chat',
         component: () => import('@/views/chat/index.vue'),
-      },{
+      }, {
         path: '/profile',
         name: 'profile',
         component: () => import('@/views/profile/index.vue'),
-      },{
+      }, {
         path: '/settings',
         name: 'settings',
         component: () => import('@/views/settings/index.vue'),
-      },{
+      }, {
         path: '/admin',
         name: 'admin',
         component: () => import('@/views/admin/index.vue'),
-      }
+      },
     ],
-  },{
+  }, {
     path: '/404',
     name: '404',
     component: () => import('@/views/exception/404/index.vue'),

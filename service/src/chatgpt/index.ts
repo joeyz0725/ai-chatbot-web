@@ -31,16 +31,15 @@ const disableDebug: boolean = process.env.OPENAI_API_DISABLE_DEBUG === 'true'
 
 let apiModel: ApiModel
 // const model = isNotEmptyString(process.env.OPENAI_API_MODEL) ? process.env.OPENAI_API_MODEL : 'gpt-3.5-turbo'
-let model = userGptConfig.model || process.env.OPENAI_API_MODEL || 'gpt-3.5-turbo';
+let model = userGptConfig.model || process.env.OPENAI_API_MODEL || 'gpt-3.5-turbo'
 
-if ((userGptConfig.openaiApiKey || !isNotEmptyString(process.env.OPENAI_API_KEY)) &&
-    (userGptConfig.accessToken || !isNotEmptyString(process.env.OPENAI_ACCESS_TOKEN))) {
-  throw new Error('Missing OPENAI_API_KEY or OPENAI_ACCESS_TOKEN environment variable');
-}
+if ((userGptConfig.openaiApiKey || !isNotEmptyString(process.env.OPENAI_API_KEY))
+    && (userGptConfig.accessToken || !isNotEmptyString(process.env.OPENAI_ACCESS_TOKEN)))
+  throw new Error('Missing OPENAI_API_KEY or OPENAI_ACCESS_TOKEN environment variable')
 
 let api: ChatGPTAPI | ChatGPTUnofficialProxyAPI
 
-async function initializeChatGPT () {
+async function initializeChatGPT() {
   // More Info: https://github.com/transitive-bullshit/chatgpt-api
   userGptConfig = chatGptConfig.getGptState()
   model = userGptConfig.model
@@ -82,10 +81,10 @@ async function initializeChatGPT () {
     apiModel = 'ChatGPTAPI'
   }
   else {
-    let options: ChatGPTUnofficialProxyAPIOptions = {
+    const options: ChatGPTUnofficialProxyAPIOptions = {
       accessToken: userGptConfig.accessToken || process.env.OPENAI_ACCESS_TOKEN,
-      apiReverseProxyUrl: userGptConfig.reverseProxyAddress || 
-        process.env.API_REVERSE_PROXY || 'https://ai.fakeopen.com/api/conversation',
+      apiReverseProxyUrl: userGptConfig.reverseProxyAddress
+        || process.env.API_REVERSE_PROXY || 'https://ai.fakeopen.com/api/conversation',
       model,
       debug: !disableDebug,
     }
@@ -96,9 +95,9 @@ async function initializeChatGPT () {
 }
 
 async function start() {
-  await initializeChatGPT();
+  await initializeChatGPT()
 }
-start();
+start()
 
 async function chatReplyProcess(options: RequestOptions) {
   userGptConfig = chatGptConfig.getGptState()
@@ -195,7 +194,7 @@ async function chatConfig() {
   userGptConfig = chatGptConfig.getGptState()
 
   const usage = await fetchUsage()
-  const reverseProxy = userGptConfig.reverseProxyAddress ?? process.env.API_REVERSE_PROXY ?? '-';
+  const reverseProxy = userGptConfig.reverseProxyAddress ?? process.env.API_REVERSE_PROXY ?? '-'
   const httpsProxy = (process.env.HTTPS_PROXY || process.env.ALL_PROXY) ?? '-'
   const socksProxy = (process.env.SOCKS_PROXY_HOST && process.env.SOCKS_PROXY_PORT)
     ? (`${process.env.SOCKS_PROXY_HOST}:${process.env.SOCKS_PROXY_PORT}`)

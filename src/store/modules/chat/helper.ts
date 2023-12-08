@@ -1,7 +1,7 @@
+import { useTokenStore } from '../token'
 import { ss } from '@/utils/storage'
 import { t } from '@/locales'
 import { getChatStateAPI, pushChatStateAPI } from '@/api/chat'
-import { useTokenStore } from '../token'
 
 const LOCAL_NAME = 'chatStorage'
 
@@ -22,7 +22,7 @@ export function defaultState(): Chat.ChatState {
 export function getChatState(): Chat.ChatState {
   const token = tokenStore.getToken()
   if (token) {
-    getChatStateAPI().then(()=>{
+    getChatStateAPI().then(() => {
       const serverState = getLocalState()
       const result = { ...defaultState(), ...serverState }
       return result
@@ -37,7 +37,7 @@ export function setChatState(state: Chat.ChatState) {
 
 export function getLocalState(): Chat.ChatState {
   const localState = ss.get(LOCAL_NAME)
-  return localState 
+  return localState
 }
 
 export function setLocalState(state: Chat.ChatState) {
@@ -46,7 +46,7 @@ export function setLocalState(state: Chat.ChatState) {
 
 export async function getServerState() {
   const serverState = await getChatStateAPI()
-  return serverState 
+  return serverState
 }
 
 export function setServerState(state: Chat.ChatState) {

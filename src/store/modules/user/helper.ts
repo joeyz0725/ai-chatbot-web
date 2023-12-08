@@ -1,6 +1,6 @@
 // 导入 `ss` 对象（假设在 '@/utils/storage' 模块中有一个名为 `ss` 的对象）
-import { ss } from '@/utils/storage'
 import { useTokenStore } from '../token'
+import { ss } from '@/utils/storage'
 import { fetchUserAPI, fetchVisitorAPI } from '@/api/user'
 import { t } from '@/locales'
 
@@ -28,19 +28,19 @@ export interface UserState {
   extra: Extra | null
 }
 
-export function processUserState (data: any) {
+export function processUserState(data: any) {
   if (data) {
     const userState: UserState = {
       userInfo: {
         name: data.name,
         avatar: data.avatar,
-        description: data.description
+        description: data.description,
       },
       extra: {
         leftCount: data.leftCount,
         isLogin: true,
-        roleType: data.roleType
-      }
+        roleType: data.roleType,
+      },
     }
     return userState
   }
@@ -60,30 +60,29 @@ export function defaultUserState(): UserState {
     extra: {
       leftCount: 0,
       isLogin: false,
-      roleType: 0
-    }
+      roleType: 0,
+    },
   }
 }
 
 export function getState(): UserState {
   const token = tokenSotre.getToken()
-  if (token) {
+  if (token)
     return getServerState()
-  }else{
+  else
     return getLocalState()
-  }
 }
-  
+
 // 定义一个函数，用于获取本地用户状态
 export function getLocalState(): UserState {
   // 从本地存储中获取用户状态，可能返回 undefined
   const localUserState: UserState | undefined = ss.get(LOCAL_NAME)
   // 未登录用户也要从服务器获取当前IP下的消息剩余次数
   fetchVisitorAPI()
-  .then((response)=>response.data.data)
-    .then(data=>{
+    .then(response => response.data.data)
+    .then((data) => {
       const aleftCount = data.leftCount
-      let userState = { ...defaultUserState(), ...localUserState }
+      const userState = { ...defaultUserState(), ...localUserState }
       if (userState.extra) {
         userState.extra.leftCount = aleftCount
         userState.extra.isLogin = false
@@ -94,7 +93,7 @@ export function getLocalState(): UserState {
       return userState
     })
   // 将获取到的用户状态与默认设置合并，并返回
-    return { ...defaultUserState(), ...localUserState }
+  return { ...defaultUserState(), ...localUserState }
 }
 // 服务器
 export function getServerState(): UserState {
@@ -102,7 +101,7 @@ export function getServerState(): UserState {
   // 从服务器中获取用户状态，可能返回 undefined
   const token = tokenSotre.getToken()
   if (token) {
-    fetchUserAPI().then(response=>response.data.data).then((data)=>{
+    fetchUserAPI().then(response => response.data.data).then((data) => {
       const userState = { ...defaultUserState(), ...localUserState, ...processUserState(data) }
       // 和浏览器同步一下
       setLocalState(userState)

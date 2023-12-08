@@ -1,7 +1,7 @@
 <script setup lang='ts'>
 import type { CSSProperties } from 'vue'
-import { computed, ref, watch } from 'vue'
-import { NLayoutSider, useDialog, NDivider } from 'naive-ui'
+import { computed, watch } from 'vue'
+import { NDivider, NLayoutSider, useDialog } from 'naive-ui'
 import List from './List.vue'
 import Header from './Header.vue'
 import Footer from './Footer.vue'
@@ -63,7 +63,7 @@ const mobileSafeArea = computed(() => {
 
 const darkDividerStyle = computed(() => ({
   // border: 1px solid var(--divider-bg-color);
-  border: appStore.theme === 'dark'? 'none':''
+  border: appStore.theme === 'dark' ? 'none' : '',
 }))
 
 const changeTriggerStyle = {
@@ -71,7 +71,6 @@ const changeTriggerStyle = {
   // background: '/src/assets/profile-pic.png',
   // fontSize: '48px'
 }
-
 
 watch(
   isMobile,
@@ -89,7 +88,7 @@ watch(
   <NLayoutSider
     :collapsed="collapsed"
     :collapsed-width="0"
-    :width="isMobile?300:330"
+    :width="isMobile ? 300 : 330"
     :show-trigger="isMobile ? false : 'bar'"
     :trigger-style="changeTriggerStyle"
     collapse-mode="transform"
@@ -146,5 +145,4 @@ watch(
     /* 样式规则 */
     border: 1px solid #000;
   }
-  
 </style>

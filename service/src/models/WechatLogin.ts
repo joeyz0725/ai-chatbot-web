@@ -1,34 +1,34 @@
 // WechatLogin.ts
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
-import { User } from './User';
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm'
+import { User } from './User'
 
 @Entity()
 export class WechatLogin {
   @PrimaryGeneratedColumn()
-  id: number;
+  id: number
 
   @ManyToOne(() => User)
   @JoinColumn({ name: 'user_id' })
-  user: User;
+  user: User
 
   @Column({ type: 'varchar' })
-  openid: string;
+  openid: string
 
   @Column({ type: 'varchar', nullable: true })
-  unionid: string | null;
+  unionid: string | null
 
   @Column({ type: 'varchar', nullable: true, name: 'access_token' })
-  accessToken: string | null;
+  accessToken: string | null
 
   @Column({ type: 'varchar', nullable: true, name: 'refresh_token' })
-  refreshToken: string | null;
+  refreshToken: string | null
 
   @Column({ type: 'int', nullable: true, name: 'expires_in' })
-  expiresIn: number | null;
+  expiresIn: number | null
 
   @CreateDateColumn({ name: 'created_at', type: 'timestamp' })
-  createdAt: Date;
+  createdAt: Date
 
   @UpdateDateColumn({ name: 'updated_at', type: 'timestamp' })
-  updatedAt: Date;
+  updatedAt: Date
 }

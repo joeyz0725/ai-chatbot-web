@@ -55,7 +55,7 @@ export default {
     showRawText: '顯示原文',
     whatToSay: '今天想跟ChatGPT說點什麼？ ',
     footerDeclaration: '內容呼叫原生 OpenAI 介面產生',
-    botInThinking: 'ChatGPT思考中......'
+    botInThinking: 'ChatGPT思考中......',
   },
   Prompts: {
     Prompt1: '它會幫你制定計劃',
@@ -108,7 +108,7 @@ export default {
     systemAutoTheme: '系統（自動）',
     lightTheme: '淺色主題',
     darkTheme: '深色主題',
-    logout: '登出登入'
+    logout: '登出登入',
   },
   store: {
     siderButton: '提示詞商店',

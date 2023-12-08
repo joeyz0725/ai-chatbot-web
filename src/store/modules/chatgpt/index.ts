@@ -1,11 +1,11 @@
 import { defineStore } from 'pinia'
 import type { GptState } from './helper'
-import { defaultConfig, getLocalConfig, setLocalConfig, removeLocalConfig } from './helper'
+import { defaultConfig, getLocalConfig, removeLocalConfig, setLocalConfig } from './helper'
 
 export const useGptStore = defineStore('gpt-store', {
   state: (): GptState => getLocalConfig(),
   actions: {
-    getDefaultState(){
+    getDefaultState() {
       return defaultConfig()
     },
     updateState(config: Partial<GptState>) {

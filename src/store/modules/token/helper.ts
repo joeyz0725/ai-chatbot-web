@@ -1,8 +1,7 @@
-
 const LOCAL_NAME = 'WEB_TOKEN'
 
 export function getLocalToken() {
-  const localToken= localStorage.getItem(LOCAL_NAME)
+  const localToken = localStorage.getItem(LOCAL_NAME)
   return localToken
 }
 
@@ -15,5 +14,3 @@ export function removeLocalToken() {
   // ss.remove(LOCAL_NAME)
   localStorage.removeItem(LOCAL_NAME)
 }
-
-

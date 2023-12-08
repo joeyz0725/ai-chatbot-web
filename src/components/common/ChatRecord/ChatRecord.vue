@@ -1,5 +1,5 @@
 <script setup lang='ts'>
-import { ref, createVNode } from 'vue'
+import { createVNode, ref } from 'vue'
 import { NDropdown } from 'naive-ui'
 import SvgIcon from '../SvgIcon/index.vue'
 import DropDownMenu from './dropdown/DropDownMenu.vue'
@@ -11,14 +11,14 @@ interface OneChat {
     uuid: number
     title: string
     isEdit: boolean
-  },
-  index: number,
+  }
+  index: number
   activeItem: {
     uuid: number
     title: string
     isEdit: boolean
     index: number
-  },
+  }
 }
 const props = defineProps<OneChat>()
 const emit: (event: string, payload?: any) => void = defineEmits()
@@ -34,8 +34,8 @@ const isMouseOn = ref<boolean>(false)
 //   emit('update:showEditModal', newValue)
 // });
 const operations = ref([{
-    key: 'operationGroup',
-  },
+  key: 'operationGroup',
+},
 ])
 
 const appStore = useAppStore()
@@ -54,15 +54,16 @@ const updateShowEditModal = (item: Chat.History, index: number, value: boolean) 
 const updateShowDelModal = (item: Chat.History, index: number, value: boolean) => {
   handleSelect(item, index)
   emit('update:showDelModal', value)
-
 }
 
 const renderOperationMenu = (item: OneChat['activeItem']) => {
-  return () => createVNode(DropDownMenu, 
-    { item: item, menuShow: showDropDown.value,
+  return () => createVNode(DropDownMenu,
+    {
+      'item': item,
+      'menuShow': showDropDown.value,
       'onUpdate:showEditModal': updateShowEditModal,
-      'onUpdate:showDelModal': updateShowDelModal
-  })
+      'onUpdate:showDelModal': updateShowDelModal,
+    })
 }
 
 const setActiveItem = (item: OneChat['activeItem']) => {
@@ -73,10 +74,10 @@ const setActiveItem = (item: OneChat['activeItem']) => {
 
 function handleSelect(item: Chat.History, index: number) {
   chatStore.setActive(item.uuid, item.title)
-  //在父组件List中，设置当前选中的项
-  let activeItem = {
+  // 在父组件List中，设置当前选中的项
+  const activeItem = {
     ...item,
-    ['index']: index
+    index,
   }
   setActiveItem(activeItem)
 
@@ -90,9 +91,9 @@ function isActive(uuid: number) {
 
 const getThemeClass = ref((uuid: number) => {
   let styleClass = ''
-  if (appStore.theme === 'dark'){
+  if (appStore.theme === 'dark') {
     styleClass = 'hover:bg-[#ffffff14] '
-    if (isActive(uuid)){
+    if (isActive(uuid)) {
       styleClass = 'bg-[#5d5cde] '
       if (!isMobile.value)
         styleClass += 'pr-14'
@@ -100,7 +101,7 @@ const getThemeClass = ref((uuid: number) => {
   }
   else {
     styleClass = 'hover:bg-[#ebecff] '
-    if (isActive(uuid)){
+    if (isActive(uuid)) {
       styleClass = 'bg-[#ebecff] '
       if (!isMobile.value)
         styleClass += 'pr-14'
@@ -110,15 +111,14 @@ const getThemeClass = ref((uuid: number) => {
 })
 
 const showDropDown = ref(false)
-const handleShowDropDown = function() {
+const handleShowDropDown = function () {
   showDropDown.value = !showDropDown.value
 }
-
-
 </script>
 
 <template>
-  <a class="relative flex items-center gap-2 px-3 py-5 break-all border-0
+  <a
+    class="relative flex items-center gap-2 px-3 py-5 break-all border-0
              rounded-md cursor-pointer group"
     :class="getThemeClass(item.uuid)"
     @mouseover="isMouseOn = true"
@@ -135,35 +135,44 @@ const handleShowDropDown = function() {
       <span>{{ item.title }}</span>
     </div>
     <template v-if="!isMobile">
-      <div v-show="isMouseOn"
-            class="absolute flex items-center justify-center
-                  w-9 h-9 right-3 my-0 mx-auto bg-white rounded-full">
-        <NDropdown :show="showDropDown"
+      <div
+        v-show="isMouseOn"
+        class="absolute flex items-center justify-center
+                  w-9 h-9 right-3 my-0 mx-auto bg-white rounded-full"
+      >
+        <NDropdown
+          :show="showDropDown"
           placement="bottom-end"
           trigger="click"
           size="large"
           :options="operations"
-          :renderOption="renderOperationMenu(props.activeItem)"
-          :onClickoutside="() => showDropDown=false"
+          :render-option="renderOperationMenu(props.activeItem)"
+          :on-clickoutside="() => showDropDown = false"
         >
-        <button class="w-9 h-9 flex items-center justify-center"
-          @click="handleShowDropDown">
-          <SvgIcon icon="ep:more-filled" class="dark:text-black"/>
-        </button>
+          <button
+            class="w-9 h-9 flex items-center justify-center"
+            @click="handleShowDropDown"
+          >
+            <SvgIcon icon="ep:more-filled" class="dark:text-black" />
+          </button>
         </NDropdown>
       </div>
     </template>
     <template v-else>
       <div class="flex justify-end items-center">
-        <button class="w-9 h-9 flex justify-end items-center"
+        <button
+          class="w-9 h-9 flex justify-end items-center"
           @click.stop="updateShowEditModal(item, index, true)"
-          @touchend.stop="updateShowEditModal(item, index, true)">
-          <SvgIcon icon="iconoir:edit" class="w-6 h-6 dark:text-white"/>
+          @touchend.stop="updateShowEditModal(item, index, true)"
+        >
+          <SvgIcon icon="iconoir:edit" class="w-6 h-6 dark:text-white" />
         </button>
-        <button class="w-9 h-9 flex justify-end items-center"
+        <button
+          class="w-9 h-9 flex justify-end items-center"
           @click.stop="updateShowDelModal(item, index, true)"
-          @touchend.stop="updateShowDelModal(item, index, true)">
-          <SvgIcon icon="ri:delete-bin-line" class="w-6 h-6 dark:text-white"/>
+          @touchend.stop="updateShowDelModal(item, index, true)"
+        >
+          <SvgIcon icon="ri:delete-bin-line" class="w-6 h-6 dark:text-white" />
         </button>
       </div>
     </template>

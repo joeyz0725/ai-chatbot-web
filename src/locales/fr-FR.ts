@@ -127,4 +127,4 @@ export default {
     onlineImportWarning: 'Remarque : Veuillez vérifier la source du fichier JSON !',
     downloadError: 'Veuillez vérifier l\'état du réseau et la validité du fichier JSON',
   },
-};
+}

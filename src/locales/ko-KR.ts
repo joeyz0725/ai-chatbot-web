@@ -107,7 +107,7 @@ export default {
     systemAutoTheme: '시스템 (자동)',
     lightTheme: '라이트 테마',
     darkTheme: '다크 테마',
-    logout: '로그아웃'
+    logout: '로그아웃',
   },
   store: {
     siderButton: '프롬프트 스토어',

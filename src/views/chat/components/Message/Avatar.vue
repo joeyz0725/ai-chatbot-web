@@ -1,10 +1,10 @@
 <script lang="ts" setup>
 import { computed } from 'vue'
 import { NAvatar } from 'naive-ui'
+import VueToyFace from 'vue-toy-face'
 import { useUserStore } from '@/store'
 import { isString } from '@/utils/is'
-// @ts-ignore
-import VueToyFace from "vue-toy-face"
+// @ts-expect-error
 import defaultAvatar from '@/assets/profile-pic.png'
 import { splitAndCombine } from '@/utils/functions'
 
@@ -16,19 +16,20 @@ defineProps<Props>()
 const userStore = useUserStore()
 
 const avatar = computed(() => userStore.userInfo?.avatar)
-const avatarGroup = computed<number>(()=>splitAndCombine(avatar.value?? '')[0] || 1)
-const avatarNumber = computed<number>(()=>splitAndCombine(avatar.value?? '')[1] || 1)
+const avatarGroup = computed<number>(() => splitAndCombine(avatar.value ?? '')[0] || 1)
+const avatarNumber = computed<number>(() => splitAndCombine(avatar.value ?? '')[1] || 1)
 </script>
 
 <template>
   <template v-if="image">
     <template v-if="isString(avatar) && avatar.length > 0">
-      <VueToyFace size="30" rounded="30" style="margin:0;"
-        :group="avatarGroup" :toy-number="avatarNumber">
-      </VueToyFace>
+      <VueToyFace
+        size="30" rounded="30" style="margin:0;"
+        :group="avatarGroup" :toy-number="avatarNumber"
+      />
     </template>
     <template v-else>
-      <NAvatar size="large" round :src="defaultAvatar" :fallback-src="defaultAvatar"/>
+      <NAvatar size="large" round :src="defaultAvatar" :fallback-src="defaultAvatar" />
     </template>
   </template>
   <span v-else class="text-[28px] text-violet-700 dark:text-white">

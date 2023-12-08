@@ -1,21 +1,22 @@
-import { getRepository } from 'typeorm';
-import { User } from '../models/User';
-import { UserMessageCount } from '../models/UserMessageCount';
-import { ChatService } from "./ChatService";
+import { getRepository } from 'typeorm'
+import { User } from '../models/User'
+import { UserMessageCount } from '../models/UserMessageCount'
+import { ChatService } from './ChatService'
 
 export class UserService {
-  private chatService: ChatService;
+  private chatService: ChatService
 
   constructor() {
-    this.chatService = new ChatService();
+    this.chatService = new ChatService()
   }
+
   public async getUserStateById(userId: number) {
-    const userRepository = getRepository(User);
-    const userMessageCountRepository = getRepository(UserMessageCount);
+    const userRepository = getRepository(User)
+    const userMessageCountRepository = getRepository(UserMessageCount)
 
     try {
-      const user = await userRepository.findOne({ where: { id: userId } });
-      const userMessageCount = await userMessageCountRepository.findOne({ where: { user } });
+      const user = await userRepository.findOne({ where: { id: userId } })
+      const userMessageCount = await userMessageCountRepository.findOne({ where: { user } })
 
       if (user && userMessageCount) {
         return {
@@ -25,12 +26,14 @@ export class UserService {
           description: user.description,
           roleType: user.roleType,
           leftCount: userMessageCount.leftCount,
-        };
-      } else {
-        return null;
+        }
       }
-    } catch (error) {
-      throw new Error('Failed to fetch user data');
+      else {
+        return null
+      }
+    }
+    catch (error) {
+      throw new Error('Failed to fetch user data')
     }
   }
 
@@ -41,24 +44,25 @@ export class UserService {
   }
 
   public async saveUserInfoById(userId: number, userInfo: Partial<User>) {
-    const userRepository = getRepository(User);
+    const userRepository = getRepository(User)
 
-  try {
+    try {
     // 根据 userId 查找对应的用户
-    const user = await userRepository.findOne({ where: { id: userId } });
+      const user = await userRepository.findOne({ where: { id: userId } })
 
-    if (user) {
+      if (user) {
       // 更新用户的 name、avatar、description 字段
-      user.name = userInfo.name || user.name;
-      user.avatar = userInfo.avatar || user.avatar;
-      user.description = userInfo.description || user.description;
+        user.name = userInfo.name || user.name
+        user.avatar = userInfo.avatar || user.avatar
+        user.description = userInfo.description || user.description
 
-      // 保存更新后的用户信息到数据库
-      await userRepository.save(user);
-      return {success: true}
+        // 保存更新后的用户信息到数据库
+        await userRepository.save(user)
+        return { success: true }
+      }
     }
-  } catch (error) {
-    throw new Error('Failed to save user information');
-  }
+    catch (error) {
+      throw new Error('Failed to save user information')
+    }
   }
 }

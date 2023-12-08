@@ -35,7 +35,6 @@ function onScrollToTop() {
 function handleExport() {
   emit('export')
 }
-
 </script>
 
 <template>
@@ -52,17 +51,21 @@ function handleExport() {
           <SvgIcon v-else class="text-2xl" icon="ri:align-right" />
         </button>
       </div>
-      <h1 v-if="usingContext"
+      <h1
+        v-if="usingContext"
         class="flex-1 px-4 pr-6 overflow-hidden cursor-pointer select-none text-ellipsis whitespace-nowrap"
         @dblclick="onScrollToTop"
       >
         {{ currentChatHistory?.title ?? '' }}
       </h1>
-      <h2 v-else
-        class="text-xl font-semibold flex-grow 
-        text-center mr-11">{{ title }}
+      <h2
+        v-else
+        class="text-xl font-semibold flex-grow
+        text-center mr-11"
+      >
+        {{ title }}
       </h2>
-      <div class="flex items-center space-x-2" v-if="usingContext">
+      <div v-if="usingContext" class="flex items-center space-x-2">
         <HoverButton @click="handleExport">
           <span class="text-3xl text-[#5d5cde] dark:text-white">
             <SvgIcon icon="fluent:share-16-regular" />

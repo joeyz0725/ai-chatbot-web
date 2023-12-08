@@ -8,16 +8,16 @@ export const useChatStore = defineStore('chat-store', {
   // 2. (): 表示一个匿名函数，这里没有传入参数。
   // 3. Chat.ChatState: Chat 命名空间中的 ChatState 接口，定义了组件的状态结构。
   // 4. =>: 箭头函数的语法，指定了函数体的执行逻辑。
-  // 5. getLocalState(): 调用 getLocalState 函数，该函数可能返回一个符合 Chat.ChatState 接口的对象。 
+  // 5. getLocalState(): 调用 getLocalState 函数，该函数可能返回一个符合 Chat.ChatState 接口的对象。
   state: (): Chat.ChatState => getChatState(),
-  
+
   getters: {
     getActive(state) {
       return state.active
-    }, 
+    },
     getActiveTitle(state) {
       return state.activeTitle
-    }, 
+    },
     getChatHistoryByCurrentActive(state: Chat.ChatState) {
       const index = state.history.findIndex(item => item.uuid === state.active)
       if (index !== -1)
@@ -30,7 +30,7 @@ export const useChatStore = defineStore('chat-store', {
       if (index !== -1) {
         activeHistory = {
           ...state.history[index],
-          'index': index
+          index,
         }
         return activeHistory
       }
@@ -231,9 +231,7 @@ export const useChatStore = defineStore('chat-store', {
 
     recordServerState() {
       setServerState(this.$state)
-    }
+    },
   },
 
-  
 })
-

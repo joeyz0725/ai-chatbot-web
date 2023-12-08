@@ -13,12 +13,12 @@ export interface GptState {
 }
 
 export function defaultConfig(): GptState {
-  return { 
+  return {
     model: 'gpt-3.5-turbo',
     openaiAddress: '',
     openaiApiKey: '',
     reverseProxyAddress: '',
-    accessToken: '' 
+    accessToken: '',
   }
 }
 

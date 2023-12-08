@@ -1,12 +1,11 @@
 <script setup lang='ts'>
 import { computed, ref } from 'vue'
-import { NDropdown, useMessage } from 'naive-ui'
+import { useMessage } from 'naive-ui'
 import AvatarComponent from './Avatar.vue'
 import TextComponent from './Text.vue'
 import { SvgIcon } from '@/components/common'
 import { useIconRender } from '@/hooks/useIconRender'
 import { t } from '@/locales'
-import { useBasicLayout } from '@/hooks/useBasicLayout'
 import { copyToClip } from '@/utils/copy'
 
 interface Props {
@@ -76,7 +75,6 @@ const options = computed(() => {
 //   }
 // }
 
-
 async function handleCopy() {
   try {
     await copyToClip(props.text || '')
@@ -91,8 +89,6 @@ function handleRegenerate() {
   messageRef.value?.scrollIntoView()
   emit('regenerate')
 }
-
-
 </script>
 
 <template>

@@ -28,7 +28,7 @@ export default {
     verify: '验证',
     unauthorizedTips: '未经授权，请先进行验证。',
     stopResponding: '停止',
-    user: '用户'
+    user: '用户',
   },
   chat: {
     newChatTitle: '新的对话',
@@ -59,7 +59,7 @@ export default {
     botInThinking: 'ChatGPT思考中......',
     noCountLeftWhenLogin: '今日聊天次数已用完，请升级VIP或明天再来',
     noCountLeftWhenNoLogin: '今日聊天次数已用完，请登录或明天再来',
-    leftCountToday: '今日剩余聊天次数：'
+    leftCountToday: '今日剩余聊天次数：',
   },
   Prompts: {
     Prompt1: '它会帮你制定计划',
@@ -165,7 +165,7 @@ export default {
     checkItemWarning: '请选择数据项',
     confirmResetTitle: '确认重置',
     confirmResetContent: '是否确定重置密码？',
-    register: '注册'
+    register: '注册',
   },
   store: {
     siderButton: '提示词商店',
@@ -192,5 +192,5 @@ export default {
     400: '400',
     404: '页面未找到',
     pageNotFound: '对不起，我们找不到您要找的页面',
-  }
+  },
 }

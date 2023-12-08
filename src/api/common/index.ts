@@ -5,8 +5,8 @@ interface LoginField {
   password: string
 }
 
-export function loginAPI( user: LoginField ) {
-  return myAxios.post('/common/login', { user: user })
+export function loginAPI(user: LoginField) {
+  return myAxios.post('/common/login', { user })
 }
 
 export function logoutAPI() {

@@ -1,5 +1,5 @@
 import { createApp } from 'vue'
-// @ts-ignore
+// @ts-expect-error
 import App from './App.vue'
 import { setupI18n } from './locales'
 import { setupAssets, setupScrollbarStyle } from './plugins'

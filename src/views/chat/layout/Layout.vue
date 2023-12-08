@@ -1,12 +1,12 @@
 <script setup lang='ts'>
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 import { NLayout, NLayoutContent } from 'naive-ui'
 import { useRouter } from 'vue-router'
 import Sider from './sider/index.vue'
 import Permission from './Permission.vue'
+import LoginModal from './LoginModal.vue'
 import { useBasicLayout } from '@/hooks/useBasicLayout'
 import { useAppStore, useAuthStore, useChatStore } from '@/store'
-import LoginModal from './LoginModal.vue'
 
 const router = useRouter()
 const appStore = useAppStore()
@@ -33,14 +33,13 @@ const getContainerClass = computed(() => {
     { 'pl-[330px]': !isMobile.value && !collapsed.value },
   ]
 })
-
 </script>
 
 <template>
-  <div class="h-full dark:bg-[#24272e] transition-all" :class="['p-0']">
+  <div class="h-full dark:bg-[#24272e] transition-all p-0">
     <div class="h-full overflow-hidden" :class="getMobileClass">
       <NLayout class="z-40 transition" :class="getContainerClass" has-sider>
-        <Sider/>
+        <Sider />
         <NLayoutContent class="h-full">
           <RouterView v-slot="{ Component, route }">
             <component :is="Component" :key="route.fullPath" />

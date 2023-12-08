@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { h, ref, createVNode, watch } from 'vue'
-import { NModal, ButtonProps } from 'naive-ui'
+import { createVNode, h, ref } from 'vue'
+import type { ButtonProps } from 'naive-ui'
+import { NModal } from 'naive-ui'
 import ConfirmInput from './dropdown/ConfirmInput.vue'
 import { useAppStore, useChatStore } from '@/store'
 import { useBasicLayout } from '@/hooks/useBasicLayout'
@@ -14,9 +15,9 @@ interface Props {
     title: string
     isEdit: boolean
     index: number
-  },
-  showEditModal: boolean;
-  showDelModal: boolean;
+  }
+  showEditModal: boolean
+  showDelModal: boolean
 }
 const props = defineProps<Props>()
 // const { activeItem, showEditModal, showDelModal } = defineProps<Props>()
@@ -33,11 +34,11 @@ const isDarkTheme = ref(appStore.theme)
 
 const pButtonProps: ButtonProps = {
   size: 'medium',
-  textColor: '#fff'
+  textColor: '#fff',
 }
 const nButtonProps: ButtonProps = {
   size: 'medium',
-  textColor: isDarkTheme.value==='dark'?'#fff':'#000'
+  textColor: isDarkTheme.value === 'dark' ? '#fff' : '#000',
 }
 
 const renderTitle = (title: string) => {
@@ -45,53 +46,54 @@ const renderTitle = (title: string) => {
     return h('div', {
       class: 'n-dialog__title',
       style: {
-        'font-weight': 'bold'
-      }
+        'font-weight': 'bold',
+      },
     }, [title])
   }
 }
 
 const renderContent = () => {
-  return () => createVNode(ConfirmInput, { 
-    activeItem: {
-      uuid: props.activeItem.uuid, title: props.activeItem.title,
-      isEdit: props.activeItem.isEdit, index: props.activeItem.index
+  return () => createVNode(ConfirmInput, {
+    'activeItem': {
+      uuid: props.activeItem.uuid,
+      title: props.activeItem.title,
+      isEdit: props.activeItem.isEdit,
+      index: props.activeItem.index,
     },
     'onUpdate:activeItem': (title: string) => {
       itemTitle.value = title
       emit('update:activeItem', {
         ...props.activeItem,
-        title
+        title,
       })
     },
     'onUpdate:showEditModal': (value) => {
       emit('update:showEditModal', value)
-    }
+    },
   })
 }
 
 function handleDelete(index: number, event?: MouseEvent | TouchEvent) {
   event?.stopPropagation()
 
-  chatStore.deleteHistory(index).then(()=>{
+  chatStore.deleteHistory(index).then(() => {
     chatStore.recordServerState()
 
     if (isMobile.value)
       appStore.setSiderCollapsed(true)
   })
-  
 }
 
 const handleDeleteDebounce = debounce(handleDelete, 600)
 
 const onEditConfirm = () => {
-  chatStore.updateHistory(props.activeItem.uuid, itemTitle.value , false )
+  chatStore.updateHistory(props.activeItem.uuid, itemTitle.value, false)
   emit('update:showEditModal', false)
 }
 const onEditCancel = () => {
   emit('update:showEditModal', false)
 }
-const onDelConfirm = function() {
+const onDelConfirm = function () {
   handleDeleteDebounce(props.activeItem.index)
   emit('update:showDelModal', false)
 }
@@ -99,7 +101,6 @@ const onDelConfirm = function() {
 const onDelCancel = () => {
   emit('update:showDelModal', false)
 }
-
 </script>
 
 <template>
@@ -109,40 +110,40 @@ const onDelCancel = () => {
   <NModal
     :show="props.showEditModal"
     preset="dialog"
-    :showIcon="false"
+    :show-icon="false"
     style="border-radius: 12px;"
-    :autoFocus="false"
-    :title="renderTitle( $t('list.editChat') )"
+    :auto-focus="false"
+    :title="renderTitle($t('list.editChat'))"
     :content="renderContent()"
-    :positiveText="$t('common.confirm')"
-    :negativeText="$t('common.cancel')"
-    :positiveButtonProps="pButtonProps"
-    :negativeButtonProps="nButtonProps"
-    :onPositiveClick= "onEditConfirm"
-    :onNegativeClick= "onEditCancel"
-    :onMaskClick="onEditCancel"
-    :onClose="onEditCancel"
+    :positive-text="$t('common.confirm')"
+    :negative-text="$t('common.cancel')"
+    :positive-button-props="pButtonProps"
+    :negative-button-props="nButtonProps"
+    :on-positive-click="onEditConfirm"
+    :on-negative-click="onEditCancel"
+    :on-mask-click="onEditCancel"
+    :on-close="onEditCancel"
   />
   <!-- 同上第一行双向绑定父组件（src/views/chat/layout/sider/List.vue） -->
   <NModal
     :show="props.showDelModal"
     preset="dialog"
-    :showIcon="false"
+    :show-icon="false"
     style="border-radius: 12px;"
-    :autoFocus="false"
+    :auto-focus="false"
     :title="renderTitle($t('list.deleteTitle'))"
     :content="$t('list.confirmDelete')"
-    :positiveText="$t('common.delete')"
-    :negativeText="$t('common.cancel')"
-    :positiveButtonProps="pButtonProps"
-    :negativeButtonProps="nButtonProps"
-    :onPositiveClick= "onDelConfirm"
-    :onNegativeClick= "onDelCancel"
-    :onMaskClick="onDelCancel"
-    :onClose="onDelCancel"
+    :positive-text="$t('common.delete')"
+    :negative-text="$t('common.cancel')"
+    :positive-button-props="pButtonProps"
+    :negative-button-props="nButtonProps"
+    :on-positive-click="onDelConfirm"
+    :on-negative-click="onDelCancel"
+    :on-mask-click="onDelCancel"
+    :on-close="onDelCancel"
   />
 </template>
 
 <style scoped>
-  
+
 </style>

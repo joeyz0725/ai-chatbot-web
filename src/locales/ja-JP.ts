@@ -107,7 +107,7 @@ export default {
     systemAutoTheme: 'システム（自動）',
     lightTheme: 'ライトテーマ',
     darkTheme: 'ダークテーマ',
-    logout: 'ログアウト'
+    logout: 'ログアウト',
   },
   store: {
     siderButton: 'プロンプトストア',

@@ -107,7 +107,7 @@ export default {
     systemAutoTheme: 'System (Auto)',
     lightTheme: 'Light theme',
     darkTheme: 'Dark theme',
-    logout: 'Log out'
+    logout: 'Log out',
   },
   store: {
     siderButton: 'Prompt Store',

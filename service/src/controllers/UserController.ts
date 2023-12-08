@@ -1,12 +1,11 @@
-import { RoleTypeMaxCountRel } from '@/types';
-import { UserService } from '../services/UserService';
+import { UserService } from '../services/UserService'
 import { extractIPv4Address } from '../utils/helper'
-
+import { RoleTypeMaxCountRel } from '@/types'
 
 export class UserController {
-  private userService: UserService;
-  private userId: number;
-  private ipAddress: string;
+  private userService: UserService
+  private userId: number
+  private ipAddress: string
 
   constructor() {
     this.userService = new UserService()
@@ -16,7 +15,7 @@ export class UserController {
     this.userId = req.userId || null
     if (this.userId) {
       const userState = await this.userService.getUserStateById(this.userId)
-      res.send({success: true, data: userState})
+      res.send({ success: true, data: userState })
     }
   }
 
@@ -25,7 +24,7 @@ export class UserController {
     const ipv4Address = extractIPv4Address(this.ipAddress)
     const leftCount = await this.userService.getUserStateByIpAddress(ipv4Address)
     const roleType = RoleTypeMaxCountRel.GUEST.roleType
-    res.send({success: true, data: {leftCount:leftCount, roleType: roleType}}) 
+    res.send({ success: true, data: { leftCount, roleType } })
   }
 
   public async saveUserInfo(req, res) {
@@ -33,12 +32,12 @@ export class UserController {
     const { name, avatar, description } = req.body.userInfo
     if (this.userId) {
       const result = await this.userService.saveUserInfoById(this.userId, { name, avatar, description })
-      if(result.success){
-        res.send({success: true, message: "修改个人资料成功"})
+      if (result.success) {
+        res.send({ success: true, message: '修改个人资料成功' })
         return
       }
     }
-    res.send({success: false, message: "修改个人资料失败"})
+    res.send({ success: false, message: '修改个人资料失败' })
     res.end()
   }
 }

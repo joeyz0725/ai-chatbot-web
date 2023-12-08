@@ -5,8 +5,8 @@ export function getChatStateAPI() {
   let serverState = {}
   return post<string>({
     url: '/chat/chat-state',
-    data: {}
-  }).then(response=>{
+    data: {},
+  }).then((response) => {
     serverState = JSON.parse(response as any)
     setLocalState(serverState as Chat.ChatState)
   })
@@ -15,6 +15,6 @@ export function getChatStateAPI() {
 export function pushChatStateAPI(chatState: Chat.ChatState) {
   return post<Chat.ChatState>({
     url: '/chat/update-chat-state',
-    data: { chatState }
+    data: { chatState },
   })
 }

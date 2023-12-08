@@ -50,7 +50,7 @@ const wrapClass = computed(() => {
     { 'text-red-500': props.error },
     'w-full',
     'whitespace-nowrap',
-    'overflow-x-auto'
+    'overflow-x-auto',
   ]
 })
 
