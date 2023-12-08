@@ -9,8 +9,11 @@ import { sendResponse } from '../utils'
 import { isNotEmptyString } from '../utils/is'
 import type { ApiModel, ChatContext, ChatGPTUnofficialProxyAPIOptions, ModelConfig } from '../types'
 import type { RequestOptions, SetProxyOptions, UsageResponse } from './types'
+import { chatGptConfig } from '@/config/chatgpt'
 
 const { HttpsProxyAgent } = httpsProxyAgent
+// 用户配置的chatgpt的一些配置项，从数据库中动态获取的
+let userGptConfig = chatGptConfig.getGptState()
 
 dotenv.config()
 
@@ -27,21 +30,26 @@ const timeoutMs: number = !isNaN(+process.env.TIMEOUT_MS) ? +process.env.TIMEOUT
 const disableDebug: boolean = process.env.OPENAI_API_DISABLE_DEBUG === 'true'
 
 let apiModel: ApiModel
-const model = isNotEmptyString(process.env.OPENAI_API_MODEL) ? process.env.OPENAI_API_MODEL : 'gpt-3.5-turbo'
+// const model = isNotEmptyString(process.env.OPENAI_API_MODEL) ? process.env.OPENAI_API_MODEL : 'gpt-3.5-turbo'
+let model = userGptConfig.model || process.env.OPENAI_API_MODEL || 'gpt-3.5-turbo';
 
-if (!isNotEmptyString(process.env.OPENAI_API_KEY) && !isNotEmptyString(process.env.OPENAI_ACCESS_TOKEN))
-  throw new Error('Missing OPENAI_API_KEY or OPENAI_ACCESS_TOKEN environment variable')
+if ((userGptConfig.openaiApiKey || !isNotEmptyString(process.env.OPENAI_API_KEY)) &&
+    (userGptConfig.accessToken || !isNotEmptyString(process.env.OPENAI_ACCESS_TOKEN))) {
+  throw new Error('Missing OPENAI_API_KEY or OPENAI_ACCESS_TOKEN environment variable');
+}
 
 let api: ChatGPTAPI | ChatGPTUnofficialProxyAPI
 
-(async () => {
+async function initializeChatGPT () {
   // More Info: https://github.com/transitive-bullshit/chatgpt-api
+  userGptConfig = chatGptConfig.getGptState()
+  model = userGptConfig.model
 
-  if (isNotEmptyString(process.env.OPENAI_API_KEY)) {
-    const OPENAI_API_BASE_URL = process.env.OPENAI_API_BASE_URL
+  if (userGptConfig.openaiApiKey || isNotEmptyString(process.env.OPENAI_API_KEY)) {
+    const OPENAI_API_BASE_URL = userGptConfig.openaiAddress || process.env.OPENAI_API_BASE_URL
 
     const options: ChatGPTAPIOptions = {
-      apiKey: process.env.OPENAI_API_KEY,
+      apiKey: userGptConfig.openaiApiKey || process.env.OPENAI_API_KEY,
       completionParams: { model },
       debug: !disableDebug,
     }
@@ -74,21 +82,28 @@ let api: ChatGPTAPI | ChatGPTUnofficialProxyAPI
     apiModel = 'ChatGPTAPI'
   }
   else {
-    const options: ChatGPTUnofficialProxyAPIOptions = {
-      accessToken: process.env.OPENAI_ACCESS_TOKEN,
-      apiReverseProxyUrl: isNotEmptyString(process.env.API_REVERSE_PROXY) ? process.env.API_REVERSE_PROXY : 'https://ai.fakeopen.com/api/conversation',
+    let options: ChatGPTUnofficialProxyAPIOptions = {
+      accessToken: userGptConfig.accessToken || process.env.OPENAI_ACCESS_TOKEN,
+      apiReverseProxyUrl: userGptConfig.reverseProxyAddress || 
+        process.env.API_REVERSE_PROXY || 'https://ai.fakeopen.com/api/conversation',
       model,
       debug: !disableDebug,
     }
-
     setupProxy(options)
-
     api = new ChatGPTUnofficialProxyAPI({ ...options })
     apiModel = 'ChatGPTUnofficialProxyAPI'
   }
-})()
+}
+
+async function start() {
+  await initializeChatGPT();
+}
+start();
 
 async function chatReplyProcess(options: RequestOptions) {
+  userGptConfig = chatGptConfig.getGptState()
+  model = userGptConfig.model
+
   const { message, lastContext, process, systemMessage, temperature, top_p } = options
   try {
     let options: SendMessageOptions = { timeoutMs }
@@ -125,8 +140,10 @@ async function chatReplyProcess(options: RequestOptions) {
 }
 
 async function fetchUsage() {
-  const OPENAI_API_KEY = process.env.OPENAI_API_KEY
-  const OPENAI_API_BASE_URL = process.env.OPENAI_API_BASE_URL
+  userGptConfig = chatGptConfig.getGptState()
+
+  const OPENAI_API_KEY = userGptConfig.openaiApiKey || process.env.OPENAI_API_KEY
+  const OPENAI_API_BASE_URL = userGptConfig.openaiAddress || process.env.OPENAI_API_BASE_URL
 
   if (!isNotEmptyString(OPENAI_API_KEY))
     return Promise.resolve('-')
@@ -175,8 +192,10 @@ function formatDate(): string[] {
 }
 
 async function chatConfig() {
+  userGptConfig = chatGptConfig.getGptState()
+
   const usage = await fetchUsage()
-  const reverseProxy = process.env.API_REVERSE_PROXY ?? '-'
+  const reverseProxy = userGptConfig.reverseProxyAddress ?? process.env.API_REVERSE_PROXY ?? '-';
   const httpsProxy = (process.env.HTTPS_PROXY || process.env.ALL_PROXY) ?? '-'
   const socksProxy = (process.env.SOCKS_PROXY_HOST && process.env.SOCKS_PROXY_PORT)
     ? (`${process.env.SOCKS_PROXY_HOST}:${process.env.SOCKS_PROXY_PORT}`)
@@ -221,4 +240,4 @@ function currentModel(): ApiModel {
 
 export type { ChatContext, ChatMessage }
 
-export { chatReplyProcess, chatConfig, currentModel }
+export { chatReplyProcess, chatConfig, currentModel, initializeChatGPT }

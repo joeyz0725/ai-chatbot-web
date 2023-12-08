@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, watch, createVNode } from 'vue'
 import { NModal, NForm, NFormItem , NInput, NButton, FormInst, useMessage } from 'naive-ui'
-import { useSettingStore, useUserStore, useTokenStore } from '@/store'
+import { useSettingStore, useUserStore, useTokenStore, useGptStore } from '@/store'
 import { t } from '@/locales'
 import { loginAPI } from '@/api/common'
 import { extractTokenFromHeader } from '@/utils/functions'
@@ -13,19 +13,19 @@ interface userInfo {
   password: string
 }
 const user = ref<userInfo>({
-  username: '1',
-  password: '1'
+  username: '',
+  password: ''
 })
 
 const formRules = {
   username: {
     required: true,
-    trigger: 'blur',
+    trigger: 'input',
     message: t('setting.usernameEmptywarning')
   },
   password: {
     required: true,
-    trigger: 'blur',
+    trigger: 'input',
     message: t('setting.passwordEmptywarning')
   }
 }
@@ -33,6 +33,7 @@ const ms = useMessage()
 const settingStore = useSettingStore()
 const userStore = useUserStore()
 const tokenStore = useTokenStore()
+const gptStore = useGptStore()
 const show = ref<boolean>(settingStore.showLoginModal ?? false)
 watch(() => settingStore.showLoginModal, (newValue) => {
   show.value = newValue
@@ -55,7 +56,7 @@ const goLogin = function (){
     return response.data
   }).then(data => {
     if (data.success){
-      const userInfo = data.data
+      const userInfo = data.data.user
       userStore.updateUserInfo({
         avatar: userInfo.avatar,
         name: userInfo.name,
@@ -63,11 +64,19 @@ const goLogin = function (){
       })
       userStore.updateExtra({
         leftCount: userInfo.leftCount,
-        isLogin: true
+        isLogin: true,
+        roleType: userInfo.roleType
       })
       settingStore.updateSetting({showLoginModal: false})
+      return data.data.config
+    } else {
+      ms.error(data.message)
+      return false
     }
-  }).catch(error => {
+  }).then(config=>{
+    gptStore.updateState(config)
+  })
+  .catch(error => {
 
   })
 }

@@ -48,7 +48,7 @@ const avatarNumber = computed<number>(()=>splitAndCombine(props.image)[1] || 1)
       </template>
       <!-- 不是用户设置菜单时，用svg图标 -->
       <template v-else>
-        <SvgIcon class="text-xl" :icon="props.image" />
+        <SvgIcon class="text-xl" size="large" :icon="props.image" />
       </template>
     </div>
     <div class="flex-1 min-w-0 ml-2 truncate">

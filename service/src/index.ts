@@ -3,6 +3,7 @@ import routes from './routes';
 import { connectToDatabase } from './config/database';
 import dotenv from 'dotenv';
 import "reflect-metadata";
+import { createAAdmin } from './config/init'
 
 dotenv.config(); // 加载 .env 文件
 
@@ -12,8 +13,8 @@ async function startServer() {
   try {
     // 建立数据库连接
     const connection = await connectToDatabase();
-
-    // ... 其他逻辑 ...
+    // 如果是首次启动，判断创建一个管理员账号
+    createAAdmin()
 
     // Use the routes defined in routes.ts
     app.use('', routes);

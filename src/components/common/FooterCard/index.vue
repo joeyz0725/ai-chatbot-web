@@ -5,13 +5,14 @@ import Card from './Card.vue'
 import UserAvatar from './UserAvatar.vue'
 import { router } from '@/router'
 import { t } from '@/locales'
-import { useAppStore, useSettingStore, useTokenStore } from '@/store'
+import { useAppStore, useSettingStore, useTokenStore, useUserStore } from '@/store'
 import { useBasicLayout } from '@/hooks/useBasicLayout'
 import { VNode } from 'vue'
 
 const appStore = useAppStore()
 const settingStore = useSettingStore()
 const tokenStore = useTokenStore()
+const userStore = useUserStore()
 const { isMobile } = useBasicLayout()
 
 let token = ref(tokenStore.token)
@@ -80,20 +81,40 @@ const vipImage = computed(function () {
   return '/src/assets/VIP.png'
 })
 
+const roleType = computed(()=>userStore.extra?.roleType)
+const toAdminPage = function () {
+  router.push({ name: 'admin' })
+  if (isMobile.value)
+    appStore.setSiderCollapsed(true)
+}
+
 </script>
 
 <template>
   <NList hoverable clickable 
     class="dark:bg-[#101014]">
-    <NListItem :class="darkHoverStyle">
-      <Card 
-        type="image"
-        :image="vipImage"
-        :title="$t('list.upgrade')"
-        :description="$t('list.upgradeDescription')"
-        >
-      </Card>
-    </NListItem>
+    <template v-if="!roleType || roleType < 20">
+      <NListItem :class="darkHoverStyle">
+        <Card 
+          type="image"
+          :image="vipImage"
+          :title="$t('list.upgrade')"
+          :description="$t('list.upgradeDescription')"
+          >
+        </Card>
+      </NListItem>
+    </template>
+    <template v-else-if="roleType && roleType === 100">
+      <NListItem :class="darkHoverStyle"
+        @click="toAdminPage">
+        <Card 
+          type="svg"
+          :image="'ri:admin-fill'"
+          :title="$t('admin.adminOnly')"
+          >
+        </Card>
+      </NListItem>
+    </template>
       <NDropdown :show="showDropDown" 
         trigger="click" :options="settingOptions" 
         placement="bottom" size="huge" width="trigger"

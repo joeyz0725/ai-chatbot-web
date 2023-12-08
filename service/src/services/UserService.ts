@@ -23,7 +23,8 @@ export class UserService {
           email: user.email,
           avatar: user.avatar,
           description: user.description,
-          leftCount: userMessageCount.leftCount
+          roleType: user.roleType,
+          leftCount: userMessageCount.leftCount,
         };
       } else {
         return null;

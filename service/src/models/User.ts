@@ -5,12 +5,15 @@ export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'varchar', name: 'username' })
+  @Column({ type: 'varchar', name: 'username', unique: true })
   username: string;
 
   @Column({ type: 'varchar', nullable: true, name: 'password' })
   password: string | null;
   
+  @Column({ name: 'role_type', type: 'int', default: 10 })
+  roleType: number;
+
   @Column({ type: 'varchar', nullable: true, name: 'name'  })
   name: string;
 

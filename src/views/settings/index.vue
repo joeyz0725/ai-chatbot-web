@@ -1,23 +1,28 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import { NButton, NRadioGroup, NRadioButton, NSelect, NCountdown } from 'naive-ui'
-import { useAppStore, useUserStore, useTokenStore } from '@/store'
+import { NButton, NRadioGroup, NRadioButton, NSelect, NCountdown, NDivider, NInput, useMessage } from 'naive-ui'
+import { useAppStore, useUserStore, useTokenStore, useGptStore } from '@/store'
 import type { Language, Theme } from '@/store/modules/app/helper'
+import type { Model } from '@/store/modules/chatgpt/helper'
 import { t } from '@/locales'
 import { useBasicLayout } from '@/hooks/useBasicLayout'
 import HeaderComponent from '../chat/components/Header/index.vue'
 import { HoverButton, SvgIcon } from '@/components/common'
 import { logoutAPI, fetchTimeAPI } from '@/api/common'
+import { saveChatgptAPI } from '@/api/config'
 
 const router = useRouter()
 const appStore = useAppStore()
 const userStore = useUserStore()
 const tokenStore = useTokenStore()
+const gptStore = useGptStore()
 const { isMobile } = useBasicLayout()
 const currentTheme = ref<Theme>(appStore.theme)
 const currentLanguage = ref<Language>(appStore.language)
 const logined = computed<boolean>(() => tokenStore.token?true:false)
+
+const ms = useMessage()
 
 const themeOptions: { label: string; value: Theme; icon: string }[] = [
   { label: t('setting.systemAutoTheme'), value: 'auto', icon: 'ri:contrast-line' }, 
@@ -50,22 +55,29 @@ const handleBack = function() {
   router.go(-1);
 }
 
+// 退出登录
 const handleLogout = function() {
   logoutAPI()
   .then((response)=>response.data)
   .then(data => {
     if (data.success) {
+      // 把gptStorage也给清除了
       tokenStore.removeToken()
+      // 把gptStorage也给清除了
+      gptStore.removeState()
+      // 重置用户对象
       userStore.resetUserInfo()
       const leftCount = data.data.leftCount
       userStore.updateExtra({
         leftCount: leftCount,
-        isLogin: false
+        isLogin: false,
+        roleType: 0
       })
       location.reload()
     }else {
       // 用户不存在
     }
+    return data
   })
   .catch(error => {
     // 处理错误
@@ -84,6 +96,77 @@ fetchTimeAPI().then(response=>response.data).then((data)=>{
   computedFreshCountTime.value = data.timeDifference
 })
 
+const roleType = computed(()=>userStore.extra?.roleType || 0)
+const modelOptions: { label: string; key: Model; value: Model }[] = [
+  { label: 'GPT-3.5', key: 'gpt-3.5-turbo', value: 'gpt-3.5-turbo' },
+  { label: 'GPT-4', key: 'gpt-4', value: 'gpt-4' }
+]
+
+const gptConfig = ref({
+  model: gptStore.model || 'gpt-3.5-turbo',
+  openaiAddress: gptStore.openaiAddress,
+  openaiApiKey: gptStore.openaiApiKey,
+  reverseProxyAddress: gptStore.reverseProxyAddress,
+  accessToken: gptStore.accessToken
+});
+watch(() => ({
+  model: gptStore.model,
+  openaiAddress: gptStore.openaiAddress,
+  openaiApiKey: gptStore.openaiApiKey,
+  reverseProxyAddress: gptStore.reverseProxyAddress,
+  accessToken: gptStore.accessToken
+}), (newState) => {
+  gptConfig.value = newState;
+});
+const isChanged = ref<boolean>(false)
+const isNotNull = ref<boolean>((
+  gptConfig.value.model !== 'gpt-3.5-turbo' ||
+  gptConfig.value.openaiAddress !== '' ||
+  gptConfig.value.openaiApiKey !== '' ||
+  gptConfig.value.reverseProxyAddress !== '' ||
+  gptConfig.value.accessToken !== ''
+))
+const handleModelSelect = function(value: Model) {
+  gptConfig.value.model = value
+  handleInputChange()
+}
+const handleInputChange = function() {
+   // 判断用户输入的值是否与初始值相等
+   const isValueChanged = (
+    gptConfig.value.model !== gptStore.model ||
+    gptConfig.value.openaiAddress !== gptStore.openaiAddress ||
+    gptConfig.value.openaiApiKey !== gptStore.openaiApiKey ||
+    gptConfig.value.reverseProxyAddress !== gptStore.reverseProxyAddress ||
+    gptConfig.value.accessToken !== gptStore.accessToken
+  );
+  // 更新 isChanged.value
+  isChanged.value = isValueChanged;
+  const isValueNotNull = (
+    gptConfig.value.model !== 'gpt-3.5-turbo' ||
+    gptConfig.value.openaiAddress !== '' ||
+    gptConfig.value.openaiApiKey !== '' ||
+    gptConfig.value.reverseProxyAddress !== '' ||
+    gptConfig.value.accessToken !== ''
+  );
+  isNotNull.value = isValueNotNull;
+}
+
+const saveConfig = function() {
+  saveChatgptAPI(gptConfig.value).
+    then(response=>response.data).
+    then(data=>{
+      if (data.success) {
+        gptStore.updateState(gptConfig.value)
+        ms.success(data.message)
+      }
+  }).catch(error=> {
+
+  })
+}
+
+const resetConfig = function() {
+  gptConfig.value = gptStore.getDefaultState()
+}
 </script>
 
 <template>
@@ -91,24 +174,25 @@ fetchTimeAPI().then(response=>response.data).then((data)=>{
     <HeaderComponent
       v-if="isMobile"
       :using-context="false"
+      :title="$t('setting.setting')"
     />
-    <div class="flex flex-col max-w-screen-xl gap-6 my-0 mx-auto">
-      <div>
-        <div class="flex justify-center items-center p-5">
-          <HoverButton @click="handleBack" class="flex items-center">
-            <span class="text-2xl dark:text-white">
-              <SvgIcon icon="uiw:left" />
-            </span>
-          </HoverButton>
-          <h2 class="text-lg font-semibold flex-grow text-center mr-11">{{ $t('setting.setting') }}</h2>
-        </div>
-      </div>
-      <div>
-        <div class="flex justify-center items-center">
-          <div class="flex flex-col gap-6"
-                :class="isMobile?'w-4/5':'w-3/5 max-w-lg'">
+    <div v-else 
+      class="flex justify-center items-center h-14
+        sticky top-0 left-0 right-0 z-30 border-b dark:border-neutral-800 bg-white/80 dark:bg-black/20 backdrop-blur">
+      <HoverButton @click="handleBack" class="flex items-center">
+        <span class="text-2xl dark:text-white">
+          <SvgIcon icon="uiw:left" />
+        </span>
+      </HoverButton>
+      <h2 class="text-xl font-semibold flex-grow 
+        text-center mr-11">{{ $t('setting.setting') }}</h2>
+    </div>
+    <div class="flex flex-col max-w-screen-xl gap-6 mt-5 mx-auto">
+      <div class="flex flex-col justify-center items-center">
+        <div :class="isMobile?'w-4/5':'w-3/5 max-w-lg'">
+          <div class="flex flex-col gap-6">
             <div class="flex flex-col gap-3">
-              <h3 class="text-xl font-bold">{{ $t('setting.theme') }}</h3>
+              <h3 class="text-lg font-bold">{{ $t('setting.theme') }}</h3>
               <NRadioGroup v-model:value="currentTheme" 
                   size="large"  name="themeSelection"
                   :on-update:value="handleThemeSelect">
@@ -121,25 +205,77 @@ fetchTimeAPI().then(response=>response.data).then((data)=>{
               </NRadioGroup>
             </div>
             <div class="flex flex-col gap-3">
-              <h3 class="text-xl font-bold">{{ $t('setting.language') }}</h3>
+              <h3 class="text-lg font-bold">{{ $t('setting.language') }}</h3>
               <NSelect v-model:value="currentLanguage" :options="languageOptions"
                   size="large" :on-update:value="handleLanguageSelect" >
               </NSelect>
             </div>
-            <div class="flex flex-col gap-3">
-              <h3 class="text-xl font-bold">{{ $t('setting.leftToday') }}</h3>
+            <div class="flex flex-col gap-2">
+              <h3 class="text-lg font-bold">{{ $t('setting.leftToday') }}</h3>
               <div class="flex justify-between">
-              <p class="text-base">{{ $t('setting.totalCount') }}：<span>{{ leftCountofToday }}</span></p>
-              <p v-show="leftCount!==-1" class="text-base">{{ $t('setting.refreshLeft')}}：
-                <NCountdown ref="countdown" :duration="computedFreshCountTime" />
-              </p>
+                <p class="text-base">{{ $t('setting.totalCount') }}：<span>{{ leftCountofToday }}</span></p>
+                <p v-show="leftCount!==-1" class="text-base">{{ $t('setting.refreshLeft')}}：
+                  <NCountdown ref="countdown" :duration="computedFreshCountTime" />
+                </p>
               </div>
             </div>
-            <div v-if="logined" class="flex justify-center mt-5">
+          </div>
+          <NDivider
+            style="color: #666; font-size: 14px; margin-bottom: 0;">
+            {{ $t('setting.userOnly')}}
+          </NDivider>
+          <div class="flex flex-col gap">
+            <div class="flex justify-between items-center my-2">
+              <h3 class="text-lg font-bold">{{ $t('setting.chatGPTConfig') }}</h3>
+              <div class="">
+                <NButton v-show="isNotNull"
+                type="default" ghost style="margin-right: 10px;" @click="resetConfig">
+                  {{ $t('common.reset') }}
+                </NButton>
+                <NButton v-show="isChanged"
+                type="error" style="margin-right: 10px;" @click="saveConfig">
+                  {{ $t('common.save') }}
+                </NButton>
+              </div>
+            </div>
+            <div class="flex flex-col p-3 gap-4 bg-[#e5e7eb] rounded-xl dark:bg-[#28282c]">
+              <div class="flex flex-wrap justify-between items-center">
+                <p class="text-base" style="flex: 0 0 auto;">{{ $t('setting.model') }}</p>
+                <NSelect v-model:value="gptConfig.model" :options="modelOptions"
+                  size="medium" :on-update:value="handleModelSelect" 
+                  :disabled="roleType<10||roleType==undefined" style="flex: 0 0 auto; width: 200px;">
+                </NSelect>
+              </div>
+              <div class="flex flex-wrap justify-between items-center">
+                <p class="text-base" style="flex: 0 0 auto;">{{ $t('setting.openaiAddress') }}</p>
+                <NInput style="flex: 0 0 auto; width: 200px;"
+                  v-model:value="gptConfig.openaiAddress" :onUpdate:value="handleInputChange" 
+                  :disabled="roleType<10||roleType==undefined" />
+              </div>
+              <div class="flex flex-wrap justify-between items-center">
+                <p class="text-base" style="flex: 0 0 auto;">{{ $t('setting.openaiApiKey') }}</p>
+                <NInput style="flex: 0 0 auto; width: 200px;"
+                  v-model:value="gptConfig.openaiApiKey" :onUpdate:value="handleInputChange" 
+                  :disabled="roleType<10||roleType==undefined" />
+              </div>
+              <div class="flex flex-wrap justify-between items-center">
+                <p class="text-base" style="flex: 0 0 auto;">{{ $t('setting.reverseProxyAddress') }}</p>
+                <NInput style="flex: 0 0 auto; width: 200px;"
+                  v-model:value="gptConfig.reverseProxyAddress" :onUpdate:value="handleInputChange" 
+                  :disabled="roleType<10||roleType==undefined" />
+              </div>
+              <div class="flex flex-wrap justify-between items-center">
+                <p class="text-base" style="flex: 0 0 auto;">{{ $t('setting.accessToken') }}</p>
+                <NInput style="flex: 0 0 auto; width: 200px;"
+                  v-model:value="gptConfig.accessToken" :onUpdate:value="handleInputChange" 
+                  :disabled="roleType<10||roleType==undefined" />
+              </div>
+            </div>
+          </div>
+          <div v-if="logined" class="flex justify-center my-8">
               <NButton type="error" ghost @click="handleLogout">
                 {{ $t('setting.logout') }}
               </NButton>
-            </div>
           </div>
         </div>
       </div>

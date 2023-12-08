@@ -134,8 +134,8 @@ watch(
     margin-top: 0;
     margin-bottom: 0;
   }
-  .n-divider__line {
-    height: 0;
+  ::v-deep(.n-divider .n-divider__line) {
+    height: 0 !important;
   }
 
   :v-deep(.n-divider) {

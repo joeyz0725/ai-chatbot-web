@@ -19,6 +19,7 @@ export interface UserInfo {
 export interface Extra {
   leftCount: number
   isLogin: boolean
+  roleType: number
 }
 
 // 定义用户状态的接口
@@ -37,7 +38,8 @@ export function processUserState (data: any) {
       },
       extra: {
         leftCount: data.leftCount,
-        isLogin: true
+        isLogin: true,
+        roleType: data.roleType
       }
     }
     return userState
@@ -56,8 +58,9 @@ export function defaultUserState(): UserState {
       description: '',
     },
     extra: {
-      leftCount: -1,
-      isLogin: false
+      leftCount: 0,
+      isLogin: false,
+      roleType: 0
     }
   }
 }
@@ -84,6 +87,7 @@ export function getLocalState(): UserState {
       if (userState.extra) {
         userState.extra.leftCount = aleftCount
         userState.extra.isLogin = false
+        userState.extra.roleType = 0
       }
       // 和浏览器同步一下
       setLocalState(userState)

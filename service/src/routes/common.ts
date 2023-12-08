@@ -1,5 +1,6 @@
 import express from 'express';
 import { authenticateUser } from '../middlewares/user/authenticateUser';
+import { encryptPassword } from '../middlewares/user/passwordEncode';
 import { CommonController } from '@/controllers/CommonController'
 
 const commonRouter = express.Router();

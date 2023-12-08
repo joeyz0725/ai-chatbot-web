@@ -1,10 +1,11 @@
 <script lang="ts" setup>
-import { computed, nextTick, ref } from 'vue'
+import { computed, nextTick } from 'vue'
 import { HoverButton, SvgIcon } from '@/components/common'
 import { useAppStore, useChatStore } from '@/store'
 
 interface Props {
   usingContext: boolean
+  title: string
 }
 
 interface Emit {
@@ -57,6 +58,10 @@ function handleExport() {
       >
         {{ currentChatHistory?.title ?? '' }}
       </h1>
+      <h2 v-else
+        class="text-xl font-semibold flex-grow 
+        text-center mr-11">{{ title }}
+      </h2>
       <div class="flex items-center space-x-2" v-if="usingContext">
         <HoverButton @click="handleExport">
           <span class="text-3xl text-[#5d5cde] dark:text-white">

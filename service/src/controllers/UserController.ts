@@ -1,3 +1,4 @@
+import { RoleTypeMaxCountRel } from '@/types';
 import { UserService } from '../services/UserService';
 import { extractIPv4Address } from '../utils/helper'
 
@@ -23,7 +24,8 @@ export class UserController {
     this.ipAddress = req.ip || null
     const ipv4Address = extractIPv4Address(this.ipAddress)
     const leftCount = await this.userService.getUserStateByIpAddress(ipv4Address)
-    res.send({success: true, data: {leftCount:leftCount}}) 
+    const roleType = RoleTypeMaxCountRel.GUEST.roleType
+    res.send({success: true, data: {leftCount:leftCount, roleType: roleType}}) 
   }
 
   public async saveUserInfo(req, res) {

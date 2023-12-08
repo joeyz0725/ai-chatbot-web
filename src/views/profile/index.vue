@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { NForm, NFormItem, NInput, NButton, 
     NAvatar, useMessage, FormInst  } from 'naive-ui'
@@ -23,7 +23,7 @@ const chatStore = useChatStore()
 
 const formRef = ref<FormInst | null>(null)
 const userInfo = ref({
-  avatar: usertore.userInfo?.avatar ?? defaultAvatar,
+  avatar: usertore.userInfo?.avatar ?? '',
   name: usertore.userInfo?.name ?? '',
   description: usertore.userInfo?.description ?? ''
 })
@@ -36,25 +36,28 @@ const formRules = {
   name: [{
       key: 'name',
       required: true,
-      trigger: ['blur'],
+      trigger: ['input'],
       message: t('setting.nameEmptywarning')
     },  {
-      key: 'name',
+      key: 'password',
       max: 15,
-      trigger: ['blur'],
+      trigger: ['input'],
       message: t('setting.nameExceedwarning')
     }
   ],
   description: {
     key: 'description',
     max: 200,
-    trigger: ['blur'],
+    trigger: ['input'],
     message: t('setting.dscriptionExceedwarning')
   }
 }
 
 const handleSave = function(e: Event) {
   e.preventDefault()
+  if (userInfo.value.name!==''){
+    userInfo.value.name = userInfo.value.name.trim()
+  }
   formRef.value?.validate((errors) => {
     if (!errors) {
       saveUserAPI(userInfo.value).then(response=>response.data).then(data=>{
@@ -101,31 +104,34 @@ const showOverlay = function(isShow: boolean) {
     <HeaderComponent
       v-if="isMobile"
       :using-context="false"
+      :title="$t('setting.profileTitle')"
     />
-    <div class="flex flex-col max-w-screen-xl gap-6 my-0 mx-auto">
-      <div>
-        <div class="flex justify-center items-center p-5">
-          <HoverButton @click="handleBack" class="flex items-center">
-            <span class="text-2xl dark:text-white">
-              <SvgIcon icon="uiw:left" />
-            </span>
-          </HoverButton>
-          <h2 class="text-lg font-semibold flex-grow text-center mr-11">{{ $t('setting.profileTitle') }}</h2>
-        </div>
-      </div>
+    <div v-else 
+      class="flex justify-center items-center h-14
+        sticky top-0 left-0 right-0 z-30 border-b dark:border-neutral-800 bg-white/80 dark:bg-black/20 backdrop-blur">
+      <HoverButton @click="handleBack" class="flex items-center">
+        <span class="text-2xl dark:text-white">
+          <SvgIcon icon="uiw:left" />
+        </span>
+      </HoverButton>
+      <h2 class="text-xl font-semibold flex-grow 
+        text-center mr-11">{{ $t('setting.profileTitle') }}</h2>
+    </div>
+    <div class="flex flex-col max-w-screen-xl gap-6 mt-5 mx-auto">
       <div>
         <NForm ref="formRef" :model="userInfo" :rules="formRules" size="large"
           class="flex flex-col justify-center items-center">
           <div class="flex justify-center items-center">
             <button @click="showModal" class="flex m-2 relative"
                 @mouseover="showOverlay(true)" @mouseout="showOverlay(false)">
-              <template v-if="userInfo.avatar && userInfo.avatar.length>0">
+              <template v-if="userInfo.avatar">
                 <VueToyFace size="80" rounded="80" style="margin:0;"
                   :group="avatarGroup" :toy-number="avatarNumber">
                 </VueToyFace>
               </template>
               <template v-else>
-                <NAvatar :src="defaultAvatar">
+                <NAvatar :src="defaultAvatar" 
+                  style="width: 80px; height: 80px; border-radius: 40px;">
                 </NAvatar>
               </template>
               <div v-show="overlayShow" class="absolute top-0 left-0 rounded-full
@@ -136,20 +142,18 @@ const showOverlay = function(isShow: boolean) {
           </div>
           <div class="w-2/5 flex flex-col gap-2"
                 :class="isMobile?'w-4/5':'w-3/5 max-w-lg'">
-            <NFormItem
-              :label="$t('setting.name')"
-              path="name">
-              <NInput v-model:value="userInfo.name" path="formRules.name" :placeholder="$t('setting.namePlaceholder')"/>
+            <NFormItem :label="$t('setting.name')" path="name">
+              <NInput v-model:value="userInfo.name" :placeholder="$t('setting.namePlaceholder')"/>
             </NFormItem>
             <NFormItem :label="$t('setting.description')" path="description">
-              <NInput v-model:value="userInfo.description" path="formRules.description" :placeholder="$t('setting.dscriptionExceedwarning')" 
+              <NInput v-model:value="userInfo.description" :placeholder="$t('setting.dscriptionExceedwarning')" 
                 type="textarea" :autosize="{ minRows: 5, maxRows: 8 }"/>
             </NFormItem>
             <div class="grid grid-flow-col justify-stretch">
-              <n-button type="primary" @click="handleSave"
+              <NButton type="primary" @click="handleSave"
                 style="height: 48px; border-radius: 16px; color: #fff">
                 {{ $t('common.save') }}
-              </n-button>
+              </NButton>
             </div>
           </div>
         </NForm>

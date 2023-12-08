@@ -31,10 +31,38 @@ export interface ModelConfig {
   usage?: string
 }
 
-export const MaxMessageCount = {
-  GUEST: 5,
-  USER: 20,
-  VIP: -1
+export const RoleTypeMaxCountRel = {
+  GUEST: {
+    roleType: 0,
+    maxCount: 5
+  },
+  USER: {
+    roleType: 10,
+    maxCount: 20
+  },
+  VIP: {
+    roleType: 20,
+    maxCount: -1
+  },
+  ADMIN: {
+    roleType: 100,
+    maxCount: -1
+  }
+}
+
+export type Model = 'gpt-3.5-turbo' | 'gpt-4'
+export interface GptState {
+  model: Model
+  openaiAddress: string
+  openaiApiKey: string
+  reverseProxyAddress: string
+  accessToken: string
+}
+
+export interface AccountField {
+  username: string
+  password: string
+  roleType: number
 }
 
 export type ApiModel = 'ChatGPTAPI' | 'ChatGPTUnofficialProxyAPI' | undefined

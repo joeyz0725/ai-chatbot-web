@@ -11,9 +11,6 @@ export class UserMessageCount {
   @JoinColumn({ name: 'user_id' })
   user: User;
 
-  @Column({ name: 'role_type', type: 'int', default: 0 })
-  roleType: number;
-
   @Column({ name: 'left_count', type: 'int', default: 0 })
   leftCount: number;
 }

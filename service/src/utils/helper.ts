@@ -1,14 +1,7 @@
-import CryptoJS from 'crypto-js';
 import jwt from 'jsonwebtoken';
 
 export function extractIPv4Address(ipAddress: string): string {
   return ipAddress.replace(/^::ffff:/, '');
-}
-
-export function decryptedPassword(password: string): string {
-  const decryptedPassword = CryptoJS.AES.decrypt(
-    password, 'encryptionKey').toString(CryptoJS.enc.Utf8)
-  return decryptedPassword
 }
 
 export function generateToken(payload) {
