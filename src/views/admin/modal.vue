@@ -83,7 +83,7 @@ const handleCreateAccount = function (e: Event) {
 const accountDatas = ref()
 const createResetColumns = (): DataTableColumns<AccountData> => [
   { type: 'selection' },
-  { title: t('admin.order'), key: 'index', width: '60' },
+  // { title: t('admin.order'), key: 'index', width: '60' },
   { title: t('setting.username'), key: 'username', ellipsis: { tooltip: true } },
   { title: t('setting.name'), key: 'name', ellipsis: { tooltip: true } },
   {
