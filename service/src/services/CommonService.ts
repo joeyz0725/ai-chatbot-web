@@ -1,9 +1,10 @@
 import type { FindOneOptions } from 'typeorm'
-import { getManager } from 'typeorm'
+import { getManager, getRepository } from 'typeorm'
 import bcryptjs from 'bcryptjs'
 import { User } from '../models/User'
 import { generateRandomUsername, generateSpecificPassword } from '../utils/generate'
 import { UserMessageCount } from '@/models/UserMessageCount'
+import type { PasswordField } from '@/types'
 import { RoleTypeMaxCountRel } from '@/types'
 
 interface UserData {
@@ -113,5 +114,35 @@ export class CommonService {
     newUser.password = hashedPassword
     newUser.roleType = RoleTypeMaxCountRel.USER.roleType
     return newUser
+  }
+
+  public async changePassword(userId: number, passwordInfo: PasswordField) {
+    const userRepository = getRepository(User); 
+    // 根据 userId 查询 User 表中的用户对象
+    const user = await userRepository.findOne({where: { id :userId }});
+    // 如果用户不存在，返回错误信息
+    if (!user) {
+      return { success: false, message: '用户不存在' };
+    }
+    // 判断提供的旧密码是否与数据库中的密码一致
+    const isOldPasswordCorrect = await bcryptjs.compare(passwordInfo.oldPassword, user.password);
+    // 如果旧密码不正确，返回错误信息
+    if (!isOldPasswordCorrect) {
+      return { success: false, message: '旧密码错误' };
+    }
+
+    // 判断新密码和确认密码是否一致
+    if (passwordInfo.newPassword !== passwordInfo.confirmNewPassword) {
+      return { success: false, message: '确认密码和新的密码不一致' };
+    }
+
+    // 将新密码加密并保存到数据库中
+    const saltRounds = 10; // 设置盐值的轮数（根据实际需求进行调整）
+    const hashedNewPassword = await bcryptjs.hash(passwordInfo.newPassword, saltRounds);
+    user.password = hashedNewPassword;
+    await userRepository.save(user);
+
+    // 返回成功信息
+    return { success: true, message: '密码修改成功' };
   }
 }

@@ -29,6 +29,7 @@ const userInfo = ref({
   name: usertore.userInfo?.name ?? '',
   description: usertore.userInfo?.description ?? '',
 })
+const roleType = ref(usertore.extra?.roleType)
 const avatarGroup = ref<number>(splitAndCombine(userInfo.value.avatar)[0] || 1)
 const avatarNumber = ref<number>(splitAndCombine(userInfo.value.avatar)[1] || 1)
 
@@ -155,6 +156,14 @@ const showOverlay = function (isShow: boolean) {
                 <SvgIcon class="text-xl text-white" icon="iconoir:profile-circle" />
               </div>
             </button>
+          </div>
+          <div class="">
+            <p>{{ $t('admin.currentAccount') }}
+              <span v-if="roleType===10">{{ $t('admin.user') }}</span>
+              <span v-else-if="roleType===20">{{ $t('admin.vip') }}</span>
+              <span v-else-if="roleType===100">{{ $t('admin.admin') }}</span>
+              <span v-else>{{ $t('list.visitor') }}</span>
+            </p>
           </div>
           <div
             class="w-2/5 flex flex-col gap-2"

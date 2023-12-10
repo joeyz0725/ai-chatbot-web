@@ -167,6 +167,7 @@ const saveConfig = function () {
 
 const resetConfig = function () {
   gptConfig.value = gptStore.getDefaultState()
+  handleInputChange()
 }
 </script>
 
@@ -205,7 +206,7 @@ const resetConfig = function () {
               <NRadioGroup
                 v-model:value="currentTheme"
                 size="large" name="themeSelection"
-                :on-update:value="handleThemeSelect"
+                @update:value="handleThemeSelect"
               >
                 <NRadioButton
                   v-for="theme in themeOptions"
@@ -222,7 +223,7 @@ const resetConfig = function () {
               </h3>
               <NSelect
                 v-model:value="currentLanguage" :options="languageOptions"
-                size="large" :on-update:value="handleLanguageSelect"
+                size="large" @update:value="handleLanguageSelect"
               />
             </div>
             <div class="flex flex-col gap-2">
@@ -240,7 +241,7 @@ const resetConfig = function () {
               </div>
             </div>
           </div>
-          <NDivider
+          <NDivider v-show="roleType < 20 || roleType === undefined"
             style="color: #666; font-size: 14px; margin-bottom: 0;"
           >
             {{ $t('setting.userOnly') }}
@@ -252,16 +253,14 @@ const resetConfig = function () {
               </h3>
               <div class="">
                 <NButton
-                  v-show="isNotNull"
+                  v-show="isNotNull" :disabled="roleType < 20 || roleType === undefined"
                   type="default" ghost style="margin-right: 10px;" @click="resetConfig"
-                >
-                  {{ $t('common.reset') }}
+                >{{ $t('common.reset') }}
                 </NButton>
                 <NButton
-                  v-show="isChanged"
+                  v-show="isChanged" :disabled="roleType < 20 || roleType === undefined"
                   type="error" style="margin-right: 10px;" @click="saveConfig"
-                >
-                  {{ $t('common.save') }}
+                >{{ $t('common.save') }}
                 </NButton>
               </div>
             </div>
@@ -272,8 +271,8 @@ const resetConfig = function () {
                 </p>
                 <NSelect
                   v-model:value="gptConfig.model" :options="modelOptions"
-                  size="medium" :on-update:value="handleModelSelect"
-                  :disabled="roleType < 10 || roleType === undefined" style="flex: 0 0 auto; width: 200px;"
+                  size="medium" @update:value="handleModelSelect"
+                  :disabled="roleType < 20 || roleType === undefined" style="flex: 0 0 auto; width: 200px;"
                 />
               </div>
               <div class="flex flex-wrap justify-between items-center">
@@ -282,8 +281,8 @@ const resetConfig = function () {
                 </p>
                 <NInput
                   v-model:value="gptConfig.openaiAddress"
-                  style="flex: 0 0 auto; width: 200px;" :on-update:value="handleInputChange"
-                  :disabled="roleType < 10 || roleType === undefined"
+                  style="flex: 0 0 auto; width: 200px;" @update:value="handleInputChange"
+                  :disabled="roleType < 20 || roleType === undefined"
                 />
               </div>
               <div class="flex flex-wrap justify-between items-center">
@@ -292,8 +291,8 @@ const resetConfig = function () {
                 </p>
                 <NInput
                   v-model:value="gptConfig.openaiApiKey"
-                  style="flex: 0 0 auto; width: 200px;" :on-update:value="handleInputChange"
-                  :disabled="roleType < 10 || roleType === undefined"
+                  style="flex: 0 0 auto; width: 200px;" @update:value="handleInputChange"
+                  :disabled="roleType < 20 || roleType === undefined"
                 />
               </div>
               <div class="flex flex-wrap justify-between items-center">
@@ -302,8 +301,8 @@ const resetConfig = function () {
                 </p>
                 <NInput
                   v-model:value="gptConfig.reverseProxyAddress"
-                  style="flex: 0 0 auto; width: 200px;" :on-update:value="handleInputChange"
-                  :disabled="roleType < 10 || roleType === undefined"
+                  style="flex: 0 0 auto; width: 200px;" @update:value="handleInputChange"
+                  :disabled="roleType < 20 || roleType === undefined"
                 />
               </div>
               <div class="flex flex-wrap justify-between items-center">
@@ -312,8 +311,8 @@ const resetConfig = function () {
                 </p>
                 <NInput
                   v-model:value="gptConfig.accessToken"
-                  style="flex: 0 0 auto; width: 200px;" :on-update:value="handleInputChange"
-                  :disabled="roleType < 10 || roleType === undefined"
+                  style="flex: 0 0 auto; width: 200px;" @update:value="handleInputChange"
+                  :disabled="roleType < 20 || roleType === undefined"
                 />
               </div>
             </div>

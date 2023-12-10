@@ -3,9 +3,10 @@ import { extractIPv4Address, generateToken, getMorningTime } from '../utils/help
 import { ChatService } from '../services/ChatService'
 import { ConfigService } from '../services/ConfigService'
 import { isNumber } from '@/utils/is'
-import type { GptState } from '@/types'
+import type { GptState, PasswordField } from '@/types'
 import { chatGptConfig } from '@/config/chatgpt'
 import { initializeChatGPT } from '@/chatgpt'
+import { userInfo } from 'os'
 
 interface User {
   name: string
@@ -84,6 +85,7 @@ export class CommonController {
     }
     catch (e) {
       res.send({ message: '服务器错误', success: false })
+      throw(e)
     }
   }
 
@@ -127,5 +129,26 @@ export class CommonController {
     const targetTime = getMorningTime(nextDay)
     const timeDifference = targetTime.getTime() - currentTime.getTime()
     res.json({ timeDifference })
+  }
+
+  public async changePassword(req, res) {
+    const userId = req.userId
+    const passwordInfo: PasswordField = {
+      oldPassword: req.body.passwordInfo.oldPassword, 
+      newPassword: req.body.passwordInfo.newPassword, 
+      confirmNewPassword: req.body.passwordInfo.confirmNewPassword
+    }
+    try{
+      if (isNumber(userId)) {
+        const result = await this.commonService.changePassword(userId, passwordInfo)
+        res.send(result)
+      }
+    }
+    catch(error){
+      res.send({ status: 'Fail', success: false, message: '操作失败' })
+    }
+    finally{
+      res.end()
+    }
   }
 }

@@ -65,4 +65,10 @@ export interface AccountField {
   roleType: number
 }
 
+export interface PasswordField {
+  oldPassword: string
+  newPassword: string
+  confirmNewPassword: string
+}
+
 export type ApiModel = 'ChatGPTAPI' | 'ChatGPTUnofficialProxyAPI' | undefined

@@ -5,6 +5,12 @@ interface LoginField {
   password: string
 }
 
+interface PasswordField {
+  oldPassword: string
+  newPassword: string
+  confirmNewPassword: string
+}
+
 export function loginAPI(user: LoginField) {
   return myAxios.post('/common/login', { user })
 }
@@ -15,4 +21,10 @@ export function logoutAPI() {
 
 export function fetchTimeAPI() {
   return myAxios.post('/common/refresh-left')
+}
+
+export function changePasswordAPI(passwordInfo: PasswordField) {
+  return myAxios.post('/common/change-password',
+    { passwordInfo }
+  )
 }

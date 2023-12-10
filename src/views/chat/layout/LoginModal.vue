@@ -2,11 +2,11 @@
 import { createVNode, ref, watch } from 'vue'
 import type { FormInst } from 'naive-ui'
 import { NButton, NForm, NFormItem, NInput, NModal, useMessage } from 'naive-ui'
-import { useGptStore, useSettingStore, useTokenStore, useUserStore } from '@/store'
+import { useGptStore, useSettingStore, useTokenStore, useUserStore, useChatStore } from '@/store'
+import { getServerState } from '@/store/modules/chat/helper'
 import { t } from '@/locales'
 import { loginAPI } from '@/api/common'
 import { extractTokenFromHeader } from '@/utils/functions'
-// @ts-expect-error
 
 interface userInfo {
   username: string
@@ -34,41 +34,56 @@ const settingStore = useSettingStore()
 const userStore = useUserStore()
 const tokenStore = useTokenStore()
 const gptStore = useGptStore()
+const chatStore = useChatStore()
 const show = ref<boolean>(settingStore.showLoginModal ?? false)
 watch(() => settingStore.showLoginModal, (newValue) => {
   show.value = newValue
 })
 const formRef = ref<FormInst | null>(null)
 
+const setAuthorizationHeader = function(response: any) {
+  if (!response.data.success) {
+    ms.error(response.data.message)
+    return Promise.reject()
+  }
+  const authorizationHeader = response.headers['authorization-web']
+  if (authorizationHeader) {
+    const token: string | null = extractTokenFromHeader(authorizationHeader)
+    if (token != null)
+      tokenStore.setToken(token)
+  }
+  return response.data
+}
+const setUser = function(data: any) {
+  const userInfo = data.data.user
+  userStore.updateUserInfo({
+    avatar: userInfo.avatar,
+    name: userInfo.name,
+    description: userInfo.description,
+  })
+  userStore.updateExtra({
+    leftCount: userInfo.leftCount,
+    isLogin: true,
+    roleType: userInfo.roleType,
+  })
+  settingStore.updateSetting({ showLoginModal: false })
+  return data.data.config
+}
+
 const goLogin = function () {
   loginAPI(user.value)
     .then((response) => {
-      if (!response.data.success) {
-        ms.error(response.data.message)
-        return Promise.reject()
-      }
-      const authorizationHeader = response.headers['authorization-web']
-      if (authorizationHeader) {
-        const token: string | null = extractTokenFromHeader(authorizationHeader)
-        if (token != null)
-          tokenStore.setToken(token)
-      }
-      return response.data
+      return setAuthorizationHeader(response)
     }).then((data) => {
       if (data.success) {
-        const userInfo = data.data.user
-        userStore.updateUserInfo({
-          avatar: userInfo.avatar,
-          name: userInfo.name,
-          description: userInfo.description,
+        const config = setUser(data)
+        // 查询用户的聊天记录
+        getServerState().then((state)=>{
+          chatStore.setChatState(state as any)
+          chatStore.setActive((state as any)?.active, (state as any)?.activeTitle)
         })
-        userStore.updateExtra({
-          leftCount: userInfo.leftCount,
-          isLogin: true,
-          roleType: userInfo.roleType,
-        })
-        settingStore.updateSetting({ showLoginModal: false })
-        return data.data.config
+        
+        return config
       }
       else {
         ms.error(data.message)
@@ -121,7 +136,7 @@ const handleEnter = (event: KeyboardEvent) => {
       <NFormItem path="password">
         <NInput
           v-model:value="user.password" size="large" :placeholder="t('setting.password')"
-          type="password" @keypress="handleEnter"
+          type="password" show-password-on="click" @keypress="handleEnter"
         />
       </NFormItem>
       <div class="w-full flex justify-between gap-3 mt-4">

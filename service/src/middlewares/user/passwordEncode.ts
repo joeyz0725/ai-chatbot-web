@@ -20,3 +20,25 @@ export async function encryptPassword(
       throw(err)
     })
 }
+
+export async function encryptChangedPassword(
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction):
+  Promise<Response<any, Record<string, any>> | void> {
+  const passwordInfo= req.body.passwordInfo
+  const hashedPasswords = {};
+  try {
+    for (const key in passwordInfo) {
+      if (passwordInfo.hasOwnProperty(key)) {
+        const password = passwordInfo[key];
+        hashedPasswords[key] = bcryptjs.hashSync(password, 10);
+      }
+    }
+    req.body.passwordInfo = hashedPasswords
+    next()
+  }
+  catch(err) {
+    throw(err)
+  }
+}

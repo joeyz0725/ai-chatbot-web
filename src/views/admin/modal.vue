@@ -75,7 +75,7 @@ const handleCreateAccount = function (e: Event) {
         })
     }
     else {
-      console.log(user.value)
+      
     }
   })
 }

@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { defaultState, getChatState, setLocalState, setServerState } from './helper'
+import { defaultState, getChatState, setChatState, setLocalState, setServerState } from './helper'
 import { router } from '@/router'
 import { t } from '@/locales'
 
@@ -46,6 +46,14 @@ export const useChatStore = defineStore('chat-store', {
   },
 
   actions: {
+    getChatState(){
+      const state = getChatState()
+      return state
+    },
+    setChatState(state: Chat.ChatState){
+      this.$state = { ...this.$state, ...state }
+      this.recordState()
+    },
     setUsingContext(context: boolean) {
       this.usingContext = context
       this.recordState()

@@ -32,6 +32,10 @@ export function getChatState(): Chat.ChatState {
 }
 
 export function setChatState(state: Chat.ChatState) {
+  const token = tokenStore.getToken()
+  if (token) {
+    setServerState(state)
+  }
   setLocalState(state)
 }
 

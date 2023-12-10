@@ -14,7 +14,7 @@ export class ChatController {
     this.chatService = new ChatService()
   }
 
-  private async chatReplyProcess(parameters: {
+  private async handlechatReply(parameters: {
     message: string
     lastContext: any
     process: (chat: ChatMessage) => void
@@ -32,26 +32,27 @@ export class ChatController {
     try {
       const { prompt, options = {}, systemMessage, temperature, top_p } = req.body as RequestProps
       let firstChunk = true
-      await this.chatReplyProcess({
+      await this.handlechatReply({
         message: prompt,
         lastContext: options,
         process: (chat: ChatMessage) => {
+
           responseObj = {
             ...chat,
-            additional: { leftCount: leftCount - 1, isLogin },
+            additional: { leftCount: leftCount, isLogin },
           }
           res.write(firstChunk
             ? JSON.stringify(responseObj)
             : `\n${JSON.stringify(responseObj)}`)
           firstChunk = false
-
-          // 如果请求ChatGPT成功，聊天次数-1
-          this.decreaseLeftCount()
         },
         systemMessage,
         temperature,
         top_p,
       })
+      
+      // 如果请求ChatGPT成功，聊天次数-1
+      this.decreaseLeftCount()
     }
     catch (error) {
       res.write(JSON.stringify({

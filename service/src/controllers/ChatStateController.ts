@@ -11,6 +11,7 @@ export class ChatStateController {
 
   public async fetchChatState(req, res) {
     // let responseObj: any = {}; // 创建一个空对象用于保存响应内容
+    this.userId = req.userId
     try {
       const chatState = await this.getChatStateByUserId(this.userId)
       res.write(chatState

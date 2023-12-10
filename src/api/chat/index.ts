@@ -9,6 +9,7 @@ export function getChatStateAPI() {
   }).then((response) => {
     serverState = JSON.parse(response as any)
     setLocalState(serverState as Chat.ChatState)
+    return serverState
   })
 }
 

@@ -1,6 +1,7 @@
 import * as dotenv from 'dotenv'
 import { ConfigService } from '../services/ConfigService'
 import type { GptState } from '@/types'
+import { isNull } from '@/utils/is'
 
 dotenv.config()
 
@@ -27,11 +28,11 @@ class ChatGptConfig {
       // 根据 userConfig 初始化 gptState 对象
       const gptConfig = result.data
       this.gptState = {
-        model: gptConfig.model,
-        openaiAddress: gptConfig.openaiAddress,
-        openaiApiKey: gptConfig.openaiApiKey,
-        reverseProxyAddress: gptConfig.reverseProxyAddress,
-        accessToken: gptConfig.accessToken,
+        model: !isNull(gptConfig.model)?gptConfig.model:'gpt-3.5-turbo',
+        openaiAddress: !isNull(gptConfig.openaiAddress)?gptConfig.openaiAddress:'',
+        openaiApiKey: !isNull(gptConfig.openaiApiKey)?gptConfig.openaiApiKey:'',
+        reverseProxyAddress: !isNull(gptConfig.reverseProxyAddress)?gptConfig.reverseProxyAddress:'',
+        accessToken: !isNull(gptConfig.accessToken)?gptConfig.accessToken:'',
       }
     }
   }

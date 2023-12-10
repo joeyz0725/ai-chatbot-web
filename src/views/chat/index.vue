@@ -16,6 +16,7 @@ import { useBasicLayout } from '@/hooks/useBasicLayout'
 import { useChatStore, usePromptStore, useUserStore } from '@/store'
 import { fetchChatAPIProcess } from '@/api'
 import { t } from '@/locales'
+import { isNumber } from '@/utils/is'
 
 let controller = new AbortController()
 
@@ -54,33 +55,45 @@ dataSources.value.forEach((item, index) => {
     updateChatSome(+uuid, index, { loading: false })
 })
 
-const leftCountToday = computed<number>(() => userStore.extra?.leftCount || -1)
-
+const noLeftText = ref<string>('')
+const leftCountToday = computed(() => userStore.$state.extra?.leftCount)
 // 判断剩余聊天次数的处理
-function checkIfNoCountLeft(data: { additional: { leftCount: number; isLogin: boolean } }) {
+function checkIfNoCountLeft(data: { additional: { leftCount: number; isLogin: boolean } }, doUpdateChat: boolean) {
   if (data.additional && data.additional.leftCount === 0) {
     // 如果 leftCount 存在且值为 0，则提示聊天次数不足
-    if ('isLogin' in data.additional) {
-      const NoLeftText = data.additional.isLogin
-        ? t('chat.noCountLeftWhenLogin')
-        : t('chat.noCountLeftWhenNoLogin')
-      ms.warning(NoLeftText)
-      // updateChatSome(
-      //   +uuid,
-      //   dataSources.value.length - 1,
-      //   { text: NoLeftText,
-      //     loading: false
-      //   }
-      // )
+      if ('isLogin' in data.additional) {
+        noLeftText.value = data.additional.isLogin
+          ? t('chat.noCountLeftWhenLogin')
+          : t('chat.noCountLeftWhenNoLogin')
+        ms.warning(noLeftText.value)
+        if (doUpdateChat) {
+          updateChatSome(
+            +uuid,
+            dataSources.value.length - 1,
+            { 
+              text: noLeftText.value,
+              loading: false
+            }
+          )
+        }
       return true
-    }
+    } 
+    return false
   }
-  userStore.updateExtra({ leftCount: data.additional.leftCount })
-  return false
 }
 
 function handleSubmit() {
-  onConversation()
+  if (isNumber(leftCountToday.value) && leftCountToday.value !== 0)
+    onConversation()
+  else {
+    const data = {
+      additional: {
+        leftCount: userStore.$state.extra?.leftCount,
+        isLogin: userStore.$state.extra?.isLogin
+      }
+    }
+    checkIfNoCountLeft(data as any, false)
+  }
 }
 
 async function onConversation() {
@@ -147,7 +160,8 @@ async function onConversation() {
             chunk = responseText.substring(lastIndex)
           try {
             const data = JSON.parse(chunk)
-            const noCountLeft = checkIfNoCountLeft(data)
+            const doUpdateChat = true
+            const noCountLeft = checkIfNoCountLeft(data, doUpdateChat)
             if (noCountLeft)
               return
             updateChat(
@@ -179,8 +193,12 @@ async function onConversation() {
       })
       updateChatSome(+uuid, dataSources.value.length - 1, { loading: false })
     }
-
     await fetchChatAPIOnce()
+    // 消息完全接收完，更新store里的聊天次数-1
+    if (isNumber(leftCountToday.value) && leftCountToday.value > 0) {
+      userStore.updateExtra({ leftCount: leftCountToday.value-1 })
+    }
+      
   }
   catch (error: any) {
     const errorMessage = error?.message ?? t('common.wrong')
@@ -232,6 +250,7 @@ async function onConversation() {
     // 在这向服务器发送记录请求
     chatStore.recordServerState()
   }
+  
 }
 
 async function onRegenerate(index: number) {
@@ -282,7 +301,8 @@ async function onRegenerate(index: number) {
             chunk = responseText.substring(lastIndex)
           try {
             const data = JSON.parse(chunk)
-            const noCountLeft = checkIfNoCountLeft(data)
+            const doUpdateChat = true
+            const noCountLeft = checkIfNoCountLeft(data, doUpdateChat)
             if (noCountLeft)
               return
             updateChat(
@@ -314,6 +334,9 @@ async function onRegenerate(index: number) {
       updateChatSome(+uuid, index, { loading: false })
     }
     await fetchChatAPIOnce()
+    // 消息完全接收完，更新store里的聊天次数-1
+    if (isNumber(leftCountToday.value) && leftCountToday.value > 0)
+      userStore.updateExtra({ leftCount: leftCountToday.value-1 })
   }
   catch (error: any) {
     if (error.message === 'canceled') {
@@ -511,6 +534,7 @@ const handleRecommendedPrompt = (promptValue: string) => {
   <div class="flex flex-col w-full h-full">
     <HeaderComponent
       v-if="isMobile"
+      title=""
       :using-context="dataSources.length ? usingContext : false"
       @export="handleExport"
       @handle-clear="handleClear"
@@ -556,7 +580,7 @@ const handleRecommendedPrompt = (promptValue: string) => {
     </main>
     <footer class="sticky bottom-0 bg-white w-full dark:bg-[#101014]">
       <div
-        v-show="leftCountToday >= 0 && leftCountToday <= 3"
+        v-show="isNumber(leftCountToday) && leftCountToday >= 0 && leftCountToday <= 3"
         class="w-full flex justify-center"
       >
         <p class="text-neutral-800">

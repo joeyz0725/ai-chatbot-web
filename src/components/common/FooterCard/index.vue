@@ -8,6 +8,8 @@ import { router } from '@/router'
 import { t } from '@/locales'
 import { useAppStore, useSettingStore, useTokenStore, useUserStore } from '@/store'
 import { useBasicLayout } from '@/hooks/useBasicLayout'
+import Upgrade from '../Upgrade/index.vue'
+import ChangePassword from '../ChangePassword/index.vue'
 
 const appStore = useAppStore()
 const settingStore = useSettingStore()
@@ -86,6 +88,22 @@ const toAdminPage = function () {
   if (isMobile.value)
     appStore.setSiderCollapsed(true)
 }
+
+const upgradeShow = ref<boolean>(false)
+const showUpgradeModal = function() {
+  upgradeShow.value = true
+}
+const hideUpgradeModal = function() {
+  upgradeShow.value = false
+}
+
+const changePasswordShow = ref<boolean>(false)
+const showChangePasswordModal = function() {
+  changePasswordShow.value = true
+}
+const hideChangePasswordModal = function() {
+  changePasswordShow.value = false
+}
 </script>
 
 <template>
@@ -94,12 +112,21 @@ const toAdminPage = function () {
     class="dark:bg-[#101014]"
   >
     <template v-if="!roleType || roleType < 20">
-      <NListItem :class="darkHoverStyle">
+      <NListItem :class="darkHoverStyle" @click="showUpgradeModal">
         <Card
           type="image"
           :image="vipImage"
           :title="$t('list.upgrade')"
           :description="$t('list.upgradeDescription')"
+        />
+      </NListItem>
+    </template>
+    <template v-else-if="roleType >= 20">
+      <NListItem :class="darkHoverStyle" @click="showChangePasswordModal">
+        <Card
+          type="svg"
+          image="mynaui:lock-open-password"
+          :title="$t('admin.changePassword')"
         />
       </NListItem>
     </template>
@@ -130,20 +157,8 @@ const toAdminPage = function () {
       </NListItem>
     </NDropdown>
   </NList>
-  <!-- <NList hoverable clickable>
-    <NListItem @click="modifyProfile()">
-      <Card :isPhoto=false
-            image="icomoon-free:profile"
-            title="修改资料"
-            description=""/>
-    </NListItem>
-    <NListItem @click="changeSettings()">
-      <Card :isPhoto=false
-            image="ant-design:setting-outlined"
-            title="其他设置"
-            description=""/>
-    </NListItem>
-  </NList> -->
+  <Upgrade v-model:visible="upgradeShow" @close="hideUpgradeModal"/>
+  <ChangePassword v-model:visible="changePasswordShow" @close="hideChangePasswordModal"/>
 </template>
 
 <style scoped>

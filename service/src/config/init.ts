@@ -13,7 +13,7 @@ export async function createAAdmin() {
       { roleType: RoleTypeMaxCountRel.ADMIN.roleType },
       })
     if (!adminUser || adminUser.length === 0) {
-      const adminUsername = 'admin'
+      const adminUsername = 'qxbadmin'
       const adminPassword = 'qixiaobao@2024'
       const salt = bcrypt.genSaltSync(10)
       const hashedPassword = bcrypt.hashSync(adminPassword, salt)
