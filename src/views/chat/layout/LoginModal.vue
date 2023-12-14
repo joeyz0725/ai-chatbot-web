@@ -1,13 +1,18 @@
 <script setup lang="ts">
-import { createVNode, ref, watch } from 'vue'
+import { createVNode, ref } from 'vue'
 import type { FormInst } from 'naive-ui'
 import { NButton, NForm, NFormItem, NInput, NModal, useMessage } from 'naive-ui'
-import { useGptStore, useSettingStore, useTokenStore, useUserStore, useChatStore } from '@/store'
+import { useGptStore, useTokenStore, useUserStore, useChatStore } from '@/store'
 import { getServerState } from '@/store/modules/chat/helper'
 import { t } from '@/locales'
 import { loginAPI } from '@/api/common'
 import { extractTokenFromHeader } from '@/utils/functions'
-
+import SvgIcon from '@/components/common/SvgIcon/index.vue'
+interface Props {
+  visible: boolean
+}
+defineProps<Props>()
+const emit: (event: string, payload?: any) => void = defineEmits()
 interface userInfo {
   username: string
   password: string
@@ -16,7 +21,6 @@ const user = ref<userInfo>({
   username: '',
   password: '',
 })
-
 const formRules = {
   username: {
     required: true,
@@ -30,15 +34,11 @@ const formRules = {
   },
 }
 const ms = useMessage()
-const settingStore = useSettingStore()
 const userStore = useUserStore()
 const tokenStore = useTokenStore()
 const gptStore = useGptStore()
 const chatStore = useChatStore()
-const show = ref<boolean>(settingStore.showLoginModal ?? false)
-watch(() => settingStore.showLoginModal, (newValue) => {
-  show.value = newValue
-})
+
 const formRef = ref<FormInst | null>(null)
 
 const setAuthorizationHeader = function(response: any) {
@@ -66,7 +66,6 @@ const setUser = function(data: any) {
     isLogin: true,
     roleType: userInfo.roleType,
   })
-  settingStore.updateSetting({ showLoginModal: false })
   return data.data.config
 }
 
@@ -82,7 +81,7 @@ const goLogin = function () {
           chatStore.setChatState(state as any)
           chatStore.setActive((state as any)?.active, (state as any)?.activeTitle)
         })
-        
+        closeModal()
         return config
       }
       else {
@@ -106,7 +105,7 @@ const login = (e: Event) => {
 }
 
 const closeModal = () => {
-  settingStore.updateSetting({ showLoginModal: false })
+  emit('hide')
 }
 
 const handleEnter = (event: KeyboardEvent) => {
@@ -115,11 +114,15 @@ const handleEnter = (event: KeyboardEvent) => {
     login(event)
   }
 }
+
+const showContactAuthor = function (){
+  emit('showContactAuthor')
+}
 </script>
 
 <template>
   <NModal
-    v-model:show="show" preset="dialog" :on-after-leave="closeModal" :closable="false"
+    :show="visible" preset="dialog" :on-after-leave="closeModal" :closable="false"
     :title="() => createVNode('h3', { class: 'my-0 mx-auto' }, t('setting.login'))" :show-icon="false"
     style="width: 328px;height: 400px; display: flex; flex-direction: column;"
   >
@@ -147,6 +150,13 @@ const handleEnter = (event: KeyboardEvent) => {
           {{ t('common.cancel') }}
         </NButton>
       </div>
+      <NButton type="default" size="large" style="margin-top: 16px;
+          color:#07C160; border-color: #07C160;" @click="showContactAuthor">
+        <template #icon>
+          <SvgIcon icon="fa:wechat" class="text-3xl" />
+        </template>
+        <span>{{ t('upgrade.contactAuthortoGetAccount') }}</span>
+      </NButton>
       <!-- 微信登录，暂不实现
       <NButton type="default" size="large" style="margin-top: 16px;
           color:#07C160; border-color: #07C160;">

@@ -1,14 +1,14 @@
 {
-  "type": "postgres",
+  "type": "mysql",
   "host": "localhost",
-  "port": 5432,
-  "username": "myusername",
-  "password": "mypassword",
-  "database": "mydatabase",
-  "synchronize": true,
-  "logging": true,
+  "port": 3306,
+  "username": "chat_bot_joey",
+  "password": "wpn2YjPNzKHAx4p7",
+  "database": "chat_bot_db",
+  "synchronize": false,
+  "logging": false,
   "entities": [
-    "src/entity/**/*.ts"
+    "src/models/**/*.ts"
   ],
   "migrations": [
     "src/migration/**/*.ts"
@@ -17,7 +17,7 @@
     "src/subscriber/**/*.ts"
   ],
   "cli": {
-    "entitiesDir": "src/entity",
+    "entitiesDir": "src/models",
     "migrationsDir": "src/migration",
     "subscribersDir": "src/subscriber"
   }

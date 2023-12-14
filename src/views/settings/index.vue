@@ -60,29 +60,24 @@ const handleLogout = function () {
   logoutAPI()
     .then(response => response.data)
     .then((data) => {
-      if (data.success) {
       // 把gptStorage也给清除了
-        tokenStore.removeToken()
-        // 把gptStorage也给清除了
-        gptStore.removeState()
-        // 重置用户对象
-        userStore.resetUserInfo()
-        const leftCount = data.data.leftCount
-        userStore.updateExtra({
-          leftCount,
-          isLogin: false,
-          roleType: 0,
-        })
-        location.reload()
-      }
-      else {
-      // 用户不存在
-      }
+      tokenStore.removeToken()
+      // 把gptStorage也给清除了
+      gptStore.removeState()
+      // 重置用户对象
+      userStore.resetUserInfo()
+      const leftCount = data.data.leftCount || 0
+      userStore.updateExtra({
+        leftCount,
+        isLogin: false,
+        roleType: 0,
+      })
+      location.reload()
       return data
     })
     .catch((error) => {
     // 处理错误
-      console.log(error)
+      throw(error)
     })
 }
 
@@ -161,7 +156,7 @@ const saveConfig = function () {
         ms.success(data.message)
       }
     }).catch((error) => {
-      console.log(error)
+      throw(error)
     })
 }
 
@@ -295,7 +290,7 @@ const resetConfig = function () {
                   :disabled="roleType < 20 || roleType === undefined"
                 />
               </div>
-              <div class="flex flex-wrap justify-between items-center">
+              <!-- <div class="flex flex-wrap justify-between items-center">
                 <p class="text-base" style="flex: 0 0 auto;">
                   {{ $t('setting.reverseProxyAddress') }}
                 </p>
@@ -314,7 +309,7 @@ const resetConfig = function () {
                   style="flex: 0 0 auto; width: 200px;" @update:value="handleInputChange"
                   :disabled="roleType < 20 || roleType === undefined"
                 />
-              </div>
+              </div> -->
             </div>
           </div>
           <div v-if="logined" class="flex justify-center my-8">

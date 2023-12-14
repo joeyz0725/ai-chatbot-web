@@ -22,12 +22,12 @@ function setupPlugins(env: ImportMetaEnv): PluginOption[] {
   ]
 }
 
-export default defineConfig((env) => {
+export default defineConfig(({ mode }) => {
   // 通过 Vite 的环境变量加载函数 loadEnv 获取当前环境的配置，
   // env.mode 表示当前的构建模式（'development' 或 'production'），
   // process.cwd() 返回当前 Node.js 进程的工作目录路径。
   // 这样可以根据构建模式和工作目录的不同加载相应的环境变量配置。
-  const viteEnv = loadEnv(env.mode, process.cwd()) as unknown as ImportMetaEnv
+  const viteEnv = loadEnv(mode, process.cwd()) as unknown as ImportMetaEnv
 
   return {
     resolve: {

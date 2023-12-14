@@ -6,13 +6,15 @@ import Card from './Card.vue'
 import UserAvatar from './UserAvatar.vue'
 import { router } from '@/router'
 import { t } from '@/locales'
-import { useAppStore, useSettingStore, useTokenStore, useUserStore } from '@/store'
+import { useAppStore, useTokenStore, useUserStore } from '@/store'
 import { useBasicLayout } from '@/hooks/useBasicLayout'
 import Upgrade from '../Upgrade/index.vue'
 import ChangePassword from '../ChangePassword/index.vue'
+import VIPImage from '@/assets/VIP.png'
+import VIPDarkImage from '@/assets/VIP-dark.png'
 
+const emit: (event: string, payload?: any) => void = defineEmits()
 const appStore = useAppStore()
-const settingStore = useSettingStore()
 const tokenStore = useTokenStore()
 const userStore = useUserStore()
 const { isMobile } = useBasicLayout()
@@ -20,7 +22,7 @@ const { isMobile } = useBasicLayout()
 const token = ref(tokenStore.token)
 const vDynamicNode = ref<VNode | null>(null)
 const goLogin = function () {
-  settingStore.updateSetting({ showLoginModal: true })
+  emit('showLoginModal')
 }
 const modifyProfile = function () {
   router.push({ name: 'profile' })
@@ -78,8 +80,8 @@ const handleShowDropDown = function () {
 
 const vipImage = computed(() => {
   if (appStore.theme === 'dark')
-    return '/src/assets/VIP-dark.png'
-  return '/src/assets/VIP.png'
+    return VIPDarkImage
+  return VIPImage
 })
 
 const roleType = computed(() => userStore.extra?.roleType)
@@ -121,7 +123,7 @@ const hideChangePasswordModal = function() {
         />
       </NListItem>
     </template>
-    <template v-else-if="roleType >= 20">
+    <template v-else>
       <NListItem :class="darkHoverStyle" @click="showChangePasswordModal">
         <Card
           type="svg"
@@ -130,7 +132,7 @@ const hideChangePasswordModal = function() {
         />
       </NListItem>
     </template>
-    <template v-else-if="roleType && roleType === 100">
+    <template v-if="roleType && roleType === 100">
       <NListItem
         :class="darkHoverStyle"
         @click="toAdminPage"
@@ -157,8 +159,10 @@ const hideChangePasswordModal = function() {
       </NListItem>
     </NDropdown>
   </NList>
-  <Upgrade v-model:visible="upgradeShow" @close="hideUpgradeModal"/>
-  <ChangePassword v-model:visible="changePasswordShow" @close="hideChangePasswordModal"/>
+  <Upgrade v-model:visible="upgradeShow" @close="hideUpgradeModal" 
+    @showContactAuthor="$emit('showContactAuthor')"/>
+  <ChangePassword v-model:visible="changePasswordShow" 
+    @close="hideChangePasswordModal"/>
 </template>
 
 <style scoped>

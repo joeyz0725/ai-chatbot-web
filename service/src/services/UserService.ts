@@ -37,9 +37,9 @@ export class UserService {
     }
   }
 
-  public async getUserStateByIpAddress(ipAddress: string) {
+  public async getUserStateByIpAddress(ipAddress: string, sessionId: string) {
     // 因为未登录的用户只有LeftCount可以获得，没有用户信息
-    const leftCount = await this.chatService.getLeftCountByIpAddress(ipAddress)
+    const leftCount = await this.chatService.getLeftCountByIpAddress(ipAddress, sessionId)
     return leftCount
   }
 

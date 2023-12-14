@@ -11,9 +11,15 @@ export function generateToken(payload) {
   return token
 }
 
-export const getMorningTime = (nextDay: boolean): Date => {
+export function getMorningTime(nextDay: boolean): Date {
   const morningTime = new Date()
   morningTime.setDate(morningTime.getDate() + (nextDay ? 1 : 0)) // 如果是明天则加1，否则加0
   morningTime.setHours(5, 0, 0, 0) // 设置为凌晨5点
   return morningTime
+}
+
+export function getClientIP(req) {
+  const forwardedFor = req.headers['x-forwarded-for'];
+  const ipAddress = forwardedFor ? forwardedFor.split(',')[0].trim() : req.socket.remoteAddress;
+  return ipAddress
 }

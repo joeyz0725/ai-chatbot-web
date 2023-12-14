@@ -1,11 +1,12 @@
 import { UserService } from '../services/UserService'
-import { extractIPv4Address } from '../utils/helper'
+import { getClientIP, extractIPv4Address } from '../utils/helper'
 import { RoleTypeMaxCountRel } from '@/types'
 
 export class UserController {
   private userService: UserService
   private userId: number
   private ipAddress: string
+  private sessionId: string
 
   constructor() {
     this.userService = new UserService()
@@ -20,9 +21,10 @@ export class UserController {
   }
 
   public async getVisitorState(req, res) {
-    this.ipAddress = req.ip || null
+    this.ipAddress = getClientIP(req) || null
+    this.sessionId = req.sessionID
     const ipv4Address = extractIPv4Address(this.ipAddress)
-    const leftCount = await this.userService.getUserStateByIpAddress(ipv4Address)
+    const leftCount = await this.userService.getUserStateByIpAddress(ipv4Address, this.sessionId)
     const roleType = RoleTypeMaxCountRel.GUEST.roleType
     res.send({ success: true, data: { leftCount, roleType } })
   }

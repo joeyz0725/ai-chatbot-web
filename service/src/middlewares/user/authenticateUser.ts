@@ -20,7 +20,7 @@ export async function authenticateUser(
   }
   catch (error) {
     // JWT验证失败或发生其他错误
-    throw(error)
+    req.userId = null
   }
   finally {
     next()

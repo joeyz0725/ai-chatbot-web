@@ -4,7 +4,6 @@ import { NLayout, NLayoutContent } from 'naive-ui'
 import { useRouter } from 'vue-router'
 import Sider from './sider/index.vue'
 import Permission from './Permission.vue'
-import LoginModal from './LoginModal.vue'
 import { useBasicLayout } from '@/hooks/useBasicLayout'
 import { useAppStore, useAuthStore, useChatStore } from '@/store'
 
@@ -33,6 +32,7 @@ const getContainerClass = computed(() => {
     { 'pl-[330px]': !isMobile.value && !collapsed.value },
   ]
 })
+
 </script>
 
 <template>
@@ -48,6 +48,5 @@ const getContainerClass = computed(() => {
       </NLayout>
     </div>
     <Permission :visible="needPermission" />
-    <LoginModal />
   </div>
 </template>

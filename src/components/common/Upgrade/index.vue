@@ -1,9 +1,8 @@
 <script setup lang='ts'>
-import { ref, computed } from 'vue'
+import { computed } from 'vue'
 import { NModal } from 'naive-ui'
 import Item from './Item.vue'
 import { useBasicLayout } from '@/hooks/useBasicLayout'
-import qrCode from '@/assets/qr-code.jpg'
 import { t } from '@/locales'
 interface Props{
   visible: boolean
@@ -85,16 +84,10 @@ const getContentClass = computed(() => {
   return styleClass
 })
 
-const qrCodeVisible = ref<boolean>(false)
-const contactAuthor = function() {
-  showAuthorWechat()
+
+const handleContactAuthor = function() {
+  emit('showContactAuthor')
   emit('close')
-}
-const showAuthorWechat = function (){
-  qrCodeVisible.value = true
-}
-const hideAuthorWechat = function (){
-  qrCodeVisible.value = false
 }
 
 </script>
@@ -116,24 +109,12 @@ const hideAuthorWechat = function (){
           :services="userItem.services"
           :start="userItem.start"
           :btnType="userItem.btnType"
-          :btnMethod="contactAuthor" />
+          :btnMethod="handleContactAuthor" />
         <Item :title="vipItem.title" 
           :services="vipItem.services" 
           :start="vipItem.start"
           :btnType="vipItem.btnType"
-          :btnMethod="contactAuthor"/>
-      </div>
-    </template>
-  </NModal>
-  <NModal ref="qrcodeRef" preset="dialog" :show="qrCodeVisible" :closable="false"
-    @mask-click="hideAuthorWechat" :showIcon="false" style="width:400px;">
-    <template #header>
-      <h2 class="text-xl font-bold mx-auto">{{t('upgrade.scanQrCode')}}</h2>
-    </template>
-    <template #default>
-      <div class="flex flex-col justify-center items-center">
-        <p >{{t('upgrade.wechatNumber')}}<span>Joey_manyoushijie</span></p>
-        <img :src="qrCode" />
+          :btnMethod="handleContactAuthor"/>
       </div>
     </template>
   </NModal>

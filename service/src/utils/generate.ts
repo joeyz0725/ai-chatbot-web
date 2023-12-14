@@ -1,3 +1,5 @@
+import * as crypto from 'crypto'
+
 function generateRandomString(length: number): string {
   const characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
   let result = ''
@@ -22,7 +24,13 @@ function generateSpecificPassword(): string {
   return 'qixiaobao2023'
 }
 
+const generateRandomKey = (): string => {
+  const randomBytes = crypto.randomBytes(32);
+  return randomBytes.toString('hex');
+}
+
 export {
   generateRandomString, generateRandomUsername,
   generateRandomPassword, generateSpecificPassword,
+  generateRandomKey,
 }

@@ -1,6 +1,6 @@
 import { ChatService } from '../services/ChatService'
 import { isNotEmptyString } from '../utils/is'
-import { extractIPv4Address } from '../utils/helper'
+import { getClientIP, extractIPv4Address } from '../utils/helper'
 import type { RequestProps } from '@/types'
 import type { ChatMessage } from '@/chatgpt'
 import { chatReplyProcess } from '@/chatgpt'
@@ -9,6 +9,7 @@ export class ChatController {
   private chatService: ChatService
   private userId: number
   private ipAddress: string
+  private sessionId: string
 
   constructor() {
     this.chatService = new ChatService()
@@ -67,8 +68,9 @@ export class ChatController {
 
   public async handleChatProcess(req, res) {
     this.userId = req.userId || null
-    this.ipAddress = req.ip || null
-    const leftCount: number = await this.getLeftCount(this.userId, this.ipAddress)
+    this.ipAddress = getClientIP(req) || null
+    this.sessionId = req.sessionID || null
+    const leftCount: number = await this.getLeftCount(this.userId, this.ipAddress, this.sessionId)
     const isLogin = !!this.userId
     if (leftCount === 0) {
       // 返回剩余次数为零的响应给前端
@@ -79,11 +81,11 @@ export class ChatController {
     this.sendMessageToChatGPT(req, res, { leftCount, isLogin })
   }
 
-  public async getLeftCount(userId: number | null, ipAddress: string | null): Promise<number> {
+  public async getLeftCount(userId: number | null, ipAddress: string | null, sessionId: string | null): Promise<number> {
     if (userId !== null)
       return this.getLeftCountByUserId(userId)
-    else if (isNotEmptyString(ipAddress))
-      return this.getLeftCountByIpAddress(ipAddress)
+    else if (isNotEmptyString(ipAddress)||isNotEmptyString(sessionId))
+      return this.getLeftCountByIpAddress(ipAddress, sessionId)
     else
       return 0
   }
@@ -93,10 +95,10 @@ export class ChatController {
     return this.chatService.getLeftCountByUserId(userId)
   }
 
-  public async getLeftCountByIpAddress(ipAddress: string): Promise<number> {
+  public async getLeftCountByIpAddress(ipAddress: string, sessionId: string): Promise<number> {
     // 调用 ChatService 来查询 ip_address_message_counts 表中的 left_count 值
     const ipv4Address = extractIPv4Address(ipAddress)
-    return this.chatService.getLeftCountByIpAddress(ipv4Address)
+    return this.chatService.getLeftCountByIpAddress(ipv4Address, sessionId)
   }
 
   public async decreaseLeftCount(): Promise<void> {

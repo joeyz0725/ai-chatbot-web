@@ -1,12 +1,11 @@
 import { CommonService } from '../services/CommonService'
-import { extractIPv4Address, generateToken, getMorningTime } from '../utils/helper'
+import { getClientIP, extractIPv4Address, generateToken, getMorningTime } from '../utils/helper'
 import { ChatService } from '../services/ChatService'
 import { ConfigService } from '../services/ConfigService'
 import { isNumber } from '@/utils/is'
 import type { GptState, PasswordField } from '@/types'
 import { chatGptConfig } from '@/config/chatgpt'
 import { initializeChatGPT } from '@/chatgpt'
-import { userInfo } from 'os'
 
 interface User {
   name: string
@@ -76,16 +75,13 @@ export class CommonController {
         await initializeChatGPT()
 
         res.send(totalResult)
-      }
-      else {
+      } else {
         result.message = userResult.message
         res.send(result)
       }
-      res.end()
     }
     catch (e) {
       res.send({ message: '服务器错误', success: false })
-      throw(e)
     }
   }
 
@@ -106,11 +102,12 @@ export class CommonController {
 
   public async logout(req, res) {
     const userId = req.userId
-    const ipAddress = req.ip
+    const ipAddress = getClientIP(req)
+    const sessionId = req.sessionID
     if (isNumber(userId)) {
       const ipv4Address = extractIPv4Address(ipAddress)
       // 去查当前ip下剩余的聊天次数
-      const leftCount = await this.chatService.getLeftCountByIpAddress(ipv4Address)
+      const leftCount = await this.chatService.getLeftCountByIpAddress(ipv4Address, sessionId)
       // 销毁单例的ChatGPT配置项
       chatGptConfig.destroyGptState()
       // 再刷新chatgpt/index.ts配置的部分gpt配置

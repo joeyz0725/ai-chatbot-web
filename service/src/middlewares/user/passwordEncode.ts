@@ -39,6 +39,7 @@ export async function encryptChangedPassword(
     next()
   }
   catch(err) {
-    throw(err)
+    // 密码加密失败
+    next()
   }
 }

@@ -1,5 +1,4 @@
-import type { FindOneOptions } from 'typeorm'
-import { getManager, getRepository } from 'typeorm'
+import { getManager, getRepository, FindOneOptions, Like } from 'typeorm'
 import { User } from '../models/User'
 import { UserMessageCount } from '../models/UserMessageCount'
 import { IpAddressMessageCount } from '../models/IpAddressMessageCount'
@@ -20,31 +19,31 @@ export class ChatService {
     return 0
   }
 
-  public async getLeftCountByIpAddress(ipAddress: string): Promise<number> {
+  public async getLeftCountByIpAddress(ipAddress: string, sessionId: string): Promise<number> {
     const entityManager = getManager()
-
     // 构建查询选项
     const options: FindOneOptions<IpAddressMessageCount> = {
-      where: { ipAddress },
+      where: [
+        { ipAddress: Like(ipAddress) },
+        { sessionId: Like(sessionId) },
+      ],
     }
 
     // 查询 ip_address_message_counts 表中的 left_count 值
-    const ipAddressMessageCount = await entityManager.findOne(IpAddressMessageCount, options)
+    let ipAddressMessageCount = await entityManager.findOne(IpAddressMessageCount, options)
 
-    if (ipAddressMessageCount) {
+    if (!ipAddressMessageCount) {
+      ipAddressMessageCount = new IpAddressMessageCount()
+      ipAddressMessageCount.leftCount = RoleTypeMaxCountRel.GUEST.maxCount
+    }
+    ipAddressMessageCount.ipAddress = ipAddress
+    ipAddressMessageCount.sessionId = sessionId
+    try {
+      await entityManager.save(ipAddressMessageCount)
       return ipAddressMessageCount.leftCount
     }
-    else {
-      const newIpAddressMessageCount = new IpAddressMessageCount()
-      newIpAddressMessageCount.ipAddress = ipAddress
-      newIpAddressMessageCount.leftCount = RoleTypeMaxCountRel.GUEST.maxCount
-      try {
-        await entityManager.save(newIpAddressMessageCount)
-      }
-      catch (e) {
-        throw (e)
-      }
-      return newIpAddressMessageCount.leftCount
+    catch (e) {
+      throw (e)
     }
   }
 
@@ -65,7 +64,7 @@ export class ChatService {
   public async decreaseLeftCountByIpAddress(ipAddress: string): Promise<void> {
     const ipAddressMessageCountRepository = getRepository(IpAddressMessageCount)
     const ipAddressMessageCount = await ipAddressMessageCountRepository.findOne({ where: { ipAddress } })
-    if (ipAddressMessageCount && ipAddressMessageCount.leftCount > RoleTypeMaxCountRel.GUEST.maxCount) {
+    if (ipAddressMessageCount && ipAddressMessageCount.leftCount > 0) {
       ipAddressMessageCount.leftCount -= 1
       await ipAddressMessageCountRepository.save(ipAddressMessageCount)
     }
