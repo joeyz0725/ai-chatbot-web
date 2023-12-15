@@ -28,7 +28,7 @@ const showDelModal = ref<boolean>(false)
 
 <template>
   <NScrollbar class="px-4">
-    <div class="flex flex-col gap-1 text-sm">
+    <div class="flex flex-col gap-1 text-base">
       <template v-if="!dataSources.length">
         <div class="flex flex-col items-center mt-4 text-center text-neutral-400">
           <SvgIcon icon="ri:inbox-line" class="mb-2 text-3xl" />

@@ -1,10 +1,10 @@
 <script lang="ts" setup>
 import { computed } from 'vue'
 import { NAvatar } from 'naive-ui'
+// @ts-ignore
 import VueToyFace from 'vue-toy-face'
 import { useUserStore } from '@/store'
 import { isString } from '@/utils/is'
-// @ts-expect-error
 import defaultAvatar from '@/assets/profile-pic.png'
 import { splitAndCombine } from '@/utils/functions'
 

@@ -5,6 +5,7 @@ import AvatarComponent from './Avatar.vue'
 import TextComponent from './Text.vue'
 import { SvgIcon } from '@/components/common'
 import { useIconRender } from '@/hooks/useIconRender'
+import { useBasicLayout } from '@/hooks/useBasicLayout'
 import { t } from '@/locales'
 import { copyToClip } from '@/utils/copy'
 
@@ -25,7 +26,7 @@ const props = defineProps<Props>()
 
 const emit = defineEmits<Emit>()
 
-// const { isMobile } = useBasicLayout()
+const { isMobile } = useBasicLayout()
 
 const { iconRender } = useIconRender()
 
@@ -94,16 +95,23 @@ function handleRegenerate() {
 <template>
   <div
     ref="messageRef"
-    class="flex w-full mb-5 overflow-hidden"
-    :class="[{ 'flex-row-reverse': inversion }]"
+    class="flex w-full overflow-hidden"
+    :class="[{ 'flex-row-reverse': inversion },
+    { 'mb-5': !isMobile }, 
+    { 'flex-col gap-1 mb-2': isMobile },
+    { 'items-end': isMobile && inversion }]"
   >
     <div
-      class="text-2xl flex items-center justify-center flex-shrink-0 h-8 overflow-hidden rounded-full basis-8"
-      :class="[inversion ? 'ml-2' : 'mr-2']"
+      class="text-2xl flex items-center justify-center flex-shrink-0 
+              w-8 h-8 overflow-hidden rounded-full basis-8"
+      :class="[inversion ? 'ml-1' : 'mr-1']"
     >
       <AvatarComponent :image="inversion" />
     </div>
-    <div class="overflow-hidden text-sm " :class="[inversion ? 'items-end ml-10' : 'items-start mr-10']">
+    <div class="overflow-hidden text-base " 
+    :class="[{ 'items-start mr-10': !isMobile && !inversion }, 
+            { 'items-end ml-10': !isMobile && inversion }
+            ]">
       <div
         class="flex items-start"
         :class="[inversion ? 'flex-col-reverse' : 'flex-col']"
