@@ -101,14 +101,19 @@ function handleRegenerate() {
     { 'flex-col gap-1 mb-2': isMobile },
     { 'items-end': isMobile && inversion }]"
   >
-    <div
-      class="text-2xl flex items-center justify-center flex-shrink-0 
-              w-8 h-8 overflow-hidden rounded-full basis-8"
-      :class="[inversion ? 'ml-1' : 'mr-1']"
-    >
-      <AvatarComponent :image="inversion" />
+    <div :class="[ {'flex items-center': isMobile},
+        {'flex-row-reverse gap-1': isMobile && inversion}]">
+      <div
+        class="text-2xl flex items-center justify-center flex-shrink-0 
+                w-8 h-8 overflow-hidden rounded-full basis-8"
+        :class="[inversion ? 'ml-1' : 'mr-1']"
+      >
+        <AvatarComponent :image="inversion" />
+      </div>
+      
+      <p v-if="isMobile">{{ props.dateTime }}</p>
     </div>
-    <div class="overflow-hidden text-base " 
+    <div class="overflow-hidden text-sm " style="font-size: 16px;" 
     :class="[{ 'items-start mr-10': !isMobile && !inversion }, 
             { 'items-end ml-10': !isMobile && inversion }
             ]">

@@ -57,7 +57,7 @@ const avatarNumber = computed<number>(() => splitAndCombine(props.image)[1] || 1
       <h2 class="overflow-hidden font-bold text-md text-ellipsis whitespace-nowrap">
         {{ props.title ?? $t('list.visitor') }}
       </h2>
-      <p class="overflow-hidden text-xs text-gray-500 text-ellipsis whitespace-nowrap">
+      <p class="overflow-hidden text-xs text-neutral-800 text-ellipsis whitespace-nowrap dark:text-neutral-400">
         <span
           v-if="isString(props.description) && props.description !== ''"
           v-html="props.description"

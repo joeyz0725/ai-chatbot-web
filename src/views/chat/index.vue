@@ -583,7 +583,7 @@ const handleRecommendedPrompt = (promptValue: string) => {
         v-show="isNumber(leftCountToday) && leftCountToday >= 0 && leftCountToday <= 3"
         class="w-full flex justify-center"
       >
-        <p class="text-neutral-800">
+        <p class="text-neutral-800 dark:text-neutral-400">
           {{ $t('chat.leftCountToday') }}
           <span class="text-red-500">{{ leftCountToday }}</span>
         </p>
