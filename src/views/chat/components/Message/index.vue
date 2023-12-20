@@ -1,10 +1,10 @@
 <script setup lang='ts'>
-import { computed, ref } from 'vue'
+import { ref } from 'vue'
 import { useMessage } from 'naive-ui'
 import AvatarComponent from './Avatar.vue'
 import TextComponent from './Text.vue'
 import { SvgIcon } from '@/components/common'
-import { useIconRender } from '@/hooks/useIconRender'
+// import { useIconRender } from '@/hooks/useIconRender'
 import { useBasicLayout } from '@/hooks/useBasicLayout'
 import { t } from '@/locales'
 import { copyToClip } from '@/utils/copy'
@@ -28,7 +28,7 @@ const emit = defineEmits<Emit>()
 
 const { isMobile } = useBasicLayout()
 
-const { iconRender } = useIconRender()
+// const { iconRender } = useIconRender()
 
 const message = useMessage()
 
@@ -38,30 +38,30 @@ const asRawText = ref(props.inversion)
 
 const messageRef = ref<HTMLElement>()
 
-const options = computed(() => {
-  const common = [
-    {
-      label: t('chat.copy'),
-      key: 'copyText',
-      icon: iconRender({ icon: 'ri:file-copy-2-line' }),
-    },
-    {
-      label: t('common.delete'),
-      key: 'delete',
-      icon: iconRender({ icon: 'ri:delete-bin-line' }),
-    },
-  ]
+// const options = computed(() => {
+//   const common = [
+//     {
+//       label: t('chat.copy'),
+//       key: 'copyText',
+//       icon: iconRender({ icon: 'ri:file-copy-2-line' }),
+//     },
+//     {
+//       label: t('common.delete'),
+//       key: 'delete',
+//       icon: iconRender({ icon: 'ri:delete-bin-line' }),
+//     },
+//   ]
 
-  if (!props.inversion) {
-    common.unshift({
-      label: asRawText.value ? t('chat.preview') : t('chat.showRawText'),
-      key: 'toggleRenderType',
-      icon: iconRender({ icon: asRawText.value ? 'ic:outline-code-off' : 'ic:outline-code' }),
-    })
-  }
+//   if (!props.inversion) {
+//     common.unshift({
+//       label: asRawText.value ? t('chat.preview') : t('chat.showRawText'),
+//       key: 'toggleRenderType',
+//       icon: iconRender({ icon: asRawText.value ? 'ic:outline-code-off' : 'ic:outline-code' }),
+//     })
+//   }
 
-  return common
-})
+//   return common
+// })
 
 // function handleSelect(key: 'copyText' | 'delete' | 'toggleRenderType') {
 //   switch (key) {

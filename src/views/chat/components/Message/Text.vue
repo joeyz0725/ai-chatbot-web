@@ -49,8 +49,8 @@ const wrapClass = computed(() => {
     props.inversion ? 'message-request' : 'message-reply',
     { 'text-red-500': props.error },
     'w-full',
-    'whitespace-nowrap',
-    'overflow-x-auto',
+    'whitespace-normal',
+    'overflow-x-hidden',
   ]
 })
 
