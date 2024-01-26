@@ -302,7 +302,8 @@ const resetConfig = function () {
                 </p>
                 <div class="flex items-center gap-2">
                   <NSlider v-model:value="gptConfig.temperature" :step="0.1" :max="2" :min="0"
-                    style="width: 150px;" @update:value="handleInputChange"/>
+                    style="width: 150px;" @update:value="handleInputChange"
+                    :disabled="roleType < 20 || roleType === undefined"/>
                   <NInputNumber
                     v-model:value="gptConfig.temperature"
                     size="small" :show-button="false"
