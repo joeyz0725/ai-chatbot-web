@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import { NButton, NCountdown, NDivider, NInput, NRadioButton, NRadioGroup, NSelect, useMessage } from 'naive-ui'
+import { NButton, NCountdown, NDivider, NInput, NRadioButton, 
+  NRadioGroup, NSelect, NSlider, NInputNumber, useMessage } from 'naive-ui'
 import HeaderComponent from '../chat/components/Header/index.vue'
 import { useAppStore, useGptStore, useTokenStore, useUserStore } from '@/store'
 import type { Language, Theme } from '@/store/modules/app/helper'
@@ -122,7 +123,7 @@ const isNotNull = ref<boolean>((
   gptConfig.value.model !== 'gpt-3.5-turbo'
   || gptConfig.value.openaiAddress !== ''
   || gptConfig.value.openaiApiKey !== ''
-  || gptConfig.value.temperature !== ''
+  || gptConfig.value.temperature !== undefined
   || gptConfig.value.reverseProxyAddress !== ''
   || gptConfig.value.accessToken !== ''
 ))
@@ -142,7 +143,7 @@ const handleInputChange = function () {
     gptConfig.value.model !== 'gpt-3.5-turbo'
     || gptConfig.value.openaiAddress !== ''
     || gptConfig.value.openaiApiKey !== ''
-    || gptConfig.value.temperature !== ''
+    || gptConfig.value.temperature !== undefined
     || gptConfig.value.reverseProxyAddress !== ''
     || gptConfig.value.accessToken !== ''
   )
@@ -299,11 +300,16 @@ const resetConfig = function () {
                 <p class="text-base" style="flex: 0 0 auto;">
                   {{ $t('setting.temperature') }}
                 </p>
-                <NInput
-                  v-model:value="gptConfig.temperature"
-                  style="flex: 0 0 auto; width: 200px;" @update:value="handleInputChange"
-                  :disabled="roleType < 20 || roleType === undefined"
-                />
+                <div class="flex items-center gap-2">
+                  <NSlider v-model:value="gptConfig.temperature" :step="0.1" :max="2" :min="0"
+                    style="width: 150px;" @update:value="handleInputChange"/>
+                  <NInputNumber
+                    v-model:value="gptConfig.temperature"
+                    size="small" :show-button="false"
+                    style="width: 40px;" @update:value="handleInputChange"
+                    :disabled="roleType < 20 || roleType === undefined"
+                  />
+                </div>
               </div>
               <!-- <div class="flex flex-wrap justify-between items-center">
                 <p class="text-base" style="flex: 0 0 auto;">

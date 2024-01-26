@@ -8,7 +8,7 @@ export interface GptState {
   model: Model
   openaiAddress: string
   openaiApiKey: string
-  temperature: string
+  temperature: number
   reverseProxyAddress: string
   accessToken: string
 }
@@ -18,7 +18,7 @@ export function defaultConfig(): GptState {
     model: 'gpt-3.5-turbo',
     openaiAddress: '',
     openaiApiKey: '',
-    temperature: '',
+    temperature: 0.8,
     reverseProxyAddress: '',
     accessToken: '',
   }
