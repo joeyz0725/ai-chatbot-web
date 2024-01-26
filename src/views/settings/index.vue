@@ -123,7 +123,7 @@ const isNotNull = ref<boolean>((
   gptConfig.value.model !== 'gpt-3.5-turbo'
   || gptConfig.value.openaiAddress !== ''
   || gptConfig.value.openaiApiKey !== ''
-  || gptConfig.value.temperature !== undefined
+  || gptConfig.value.temperature !== null
   || gptConfig.value.reverseProxyAddress !== ''
   || gptConfig.value.accessToken !== ''
 ))
@@ -143,7 +143,7 @@ const handleInputChange = function () {
     gptConfig.value.model !== 'gpt-3.5-turbo'
     || gptConfig.value.openaiAddress !== ''
     || gptConfig.value.openaiApiKey !== ''
-    || gptConfig.value.temperature !== undefined
+    || gptConfig.value.temperature !== null
     || gptConfig.value.reverseProxyAddress !== ''
     || gptConfig.value.accessToken !== ''
   )
@@ -305,7 +305,7 @@ const resetConfig = function () {
                     style="width: 150px;" @update:value="handleInputChange"
                     :disabled="roleType < 20 || roleType === undefined"/>
                   <NInputNumber
-                    v-model:value="gptConfig.temperature"
+                    v-model:value="gptConfig.temperature" :step="0.1" :max="2" :min="0"
                     size="small" :show-button="false"
                     style="width: 40px;" @update:value="handleInputChange"
                     :disabled="roleType < 20 || roleType === undefined"
