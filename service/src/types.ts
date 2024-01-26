@@ -57,6 +57,7 @@ export interface GptState {
   openaiApiKey: string
   reverseProxyAddress: string
   accessToken: string
+  temperature: string
 }
 
 export interface AccountField {

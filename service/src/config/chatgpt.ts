@@ -11,6 +11,7 @@ const nullGptState = {
   openaiApiKey: '',
   reverseProxyAddress: '',
   accessToken: '',
+  temperature: 0.8,
 }
 class ChatGptConfig {
   private gptState: GptState | null
@@ -31,6 +32,7 @@ class ChatGptConfig {
         model: !isNull(gptConfig.model)?gptConfig.model:'gpt-3.5-turbo',
         openaiAddress: !isNull(gptConfig.openaiAddress)?gptConfig.openaiAddress:'',
         openaiApiKey: !isNull(gptConfig.openaiApiKey)?gptConfig.openaiApiKey:'',
+        temperature: !isNull(gptConfig.openaiApiKey)?gptConfig.temperature:'',
         reverseProxyAddress: !isNull(gptConfig.reverseProxyAddress)?gptConfig.reverseProxyAddress:'',
         accessToken: !isNull(gptConfig.accessToken)?gptConfig.accessToken:'',
       }

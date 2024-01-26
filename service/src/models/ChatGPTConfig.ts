@@ -21,6 +21,9 @@ export class ChatgptConfig {
   @Column({ name: 'access_token', type: 'varchar', length: 2000, nullable: true })
   accessToken: string
 
+  @Column({ name: 'temperature', type: 'decimal', precision: 3, scale: 1, nullable: true, default: null })
+  temperature: number;
+
   @ManyToOne(() => User)
   @JoinColumn({ name: 'user_id' })
   user: User

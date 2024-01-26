@@ -103,6 +103,7 @@ const gptConfig = ref({
   model: gptStore.model || 'gpt-3.5-turbo',
   openaiAddress: gptStore.openaiAddress,
   openaiApiKey: gptStore.openaiApiKey,
+  temperature: gptStore.temperature,
   reverseProxyAddress: gptStore.reverseProxyAddress,
   accessToken: gptStore.accessToken,
 })
@@ -110,6 +111,7 @@ watch(() => ({
   model: gptStore.model,
   openaiAddress: gptStore.openaiAddress,
   openaiApiKey: gptStore.openaiApiKey,
+  temperature: gptStore.temperature,
   reverseProxyAddress: gptStore.reverseProxyAddress,
   accessToken: gptStore.accessToken,
 }), (newState) => {
@@ -120,6 +122,7 @@ const isNotNull = ref<boolean>((
   gptConfig.value.model !== 'gpt-3.5-turbo'
   || gptConfig.value.openaiAddress !== ''
   || gptConfig.value.openaiApiKey !== ''
+  || gptConfig.value.temperature !== ''
   || gptConfig.value.reverseProxyAddress !== ''
   || gptConfig.value.accessToken !== ''
 ))
@@ -129,6 +132,7 @@ const handleInputChange = function () {
     gptConfig.value.model !== gptStore.model
     || gptConfig.value.openaiAddress !== gptStore.openaiAddress
     || gptConfig.value.openaiApiKey !== gptStore.openaiApiKey
+    || gptConfig.value.temperature !== gptStore.temperature
     || gptConfig.value.reverseProxyAddress !== gptStore.reverseProxyAddress
     || gptConfig.value.accessToken !== gptStore.accessToken
   )
@@ -138,6 +142,7 @@ const handleInputChange = function () {
     gptConfig.value.model !== 'gpt-3.5-turbo'
     || gptConfig.value.openaiAddress !== ''
     || gptConfig.value.openaiApiKey !== ''
+    || gptConfig.value.temperature !== ''
     || gptConfig.value.reverseProxyAddress !== ''
     || gptConfig.value.accessToken !== ''
   )
@@ -286,6 +291,16 @@ const resetConfig = function () {
                 </p>
                 <NInput
                   v-model:value="gptConfig.openaiApiKey"
+                  style="flex: 0 0 auto; width: 200px;" @update:value="handleInputChange"
+                  :disabled="roleType < 20 || roleType === undefined"
+                />
+              </div>
+              <div class="flex flex-wrap justify-between items-center">
+                <p class="text-base" style="flex: 0 0 auto;">
+                  {{ $t('setting.temperature') }}
+                </p>
+                <NInput
+                  v-model:value="gptConfig.temperature"
                   style="flex: 0 0 auto; width: 200px;" @update:value="handleInputChange"
                   :disabled="roleType < 20 || roleType === undefined"
                 />
