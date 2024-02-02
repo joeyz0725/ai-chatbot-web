@@ -8,6 +8,7 @@ export default {
     deleteSuccess: '刪除成功',
     save: '儲存',
     saveSuccess: '儲存成功',
+    saveFailure: '保存失敗',
     reset: '重設',
     action: '操作',
     export: '匯出',
@@ -29,6 +30,8 @@ export default {
     unauthorizedTips: '未經授權，請先進行驗證。',
     stopResponding: '停止',
     user: '使用者',
+    searchSuccess: "查詢成功",
+    searchFailure: "查詢失敗"
   },
   chat: {
     newChatTitle: '新的對話',
@@ -170,7 +173,10 @@ export default {
     changePassword: '修改密碼',
     oldPassword: '初始密碼',
     newPassword: '新的密碼',
-    confirmNewPassword: '確認密碼'
+    confirmNewPassword: '確認密碼',
+    rootAPIConfig: "公共 API 配置",
+    rootApiKey: "公共 API 密鑰",
+    rootApiBaseUrl: "公共 API 地址",
   },
   upgrade: {
     selectItem: '選擇您的帳戶',

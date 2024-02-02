@@ -121,4 +121,14 @@ export class AdminService {
       return { success: false, message: '密码重置失败' }
     }
   }
+
+  public async checkAuthority(userId: number) {
+    // 通过 userId 去数据库查找对应的 User 对象
+    const reqUser = await this.findUserById(userId)
+    // 如果 User 不存在或者 User 中的 roleType 的值小于 100，则返回无权限操作
+    if (!reqUser || reqUser.roleType < 100)
+      return { success: false, message: '无权限操作' }
+
+    return { success: true, message: '超级管理员账号' }
+  }
 }

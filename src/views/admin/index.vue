@@ -1,12 +1,15 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { NButton } from 'naive-ui'
+import { NButton, NInput, useMessage } from 'naive-ui'
 import { useRouter } from 'vue-router'
 import HeaderComponent from '../chat/components/Header/index.vue'
 import AdminModal from './modal.vue'
 import { useBasicLayout } from '@/hooks/useBasicLayout'
 import { HoverButton, SvgIcon } from '@/components/common'
+import { fetchApiConfig, saveApiConfig } from '@/api/admin'
+import { t } from '@/locales'
 
+const ms = useMessage()
 const router = useRouter()
 const { isMobile } = useBasicLayout()
 
@@ -27,6 +30,37 @@ const showResetModal = function () {
 }
 const hideResetModal = function () {
   isResetShow.value = false
+}
+
+const apiConfig = ref({
+  apiKey: '',
+  apiBaseUrl: ''
+})
+fetchApiConfig().then(data=>{
+  const config = data.data.data
+  apiConfig.value.apiKey = config.openaiApiKey
+  apiConfig.value.apiBaseUrl = config.openaiApiBaseUrl
+}).catch(e=>{
+  ms.error(t('common.searchFailure'))
+})
+
+const clickResetApiConfig = function() {
+  apiConfig.value.apiKey = ''
+  apiConfig.value.apiBaseUrl = ''
+}
+const clickSaveApiConfig = function() {
+  saveApiConfig(apiConfig.value).then(data=>{
+    const result = data.data
+    if(result.success){
+      apiConfig.value.apiKey = result.data.apiKey
+      apiConfig.value.apiBaseUrl = result.data.apiBaseUrl
+      ms.success(result.message)
+    }else{
+      ms.error(result.message)
+    }
+  }).catch(e=>{
+    ms.error(t('common.saveFailure'))
+  })
 }
 </script>
 
@@ -78,6 +112,41 @@ const hideResetModal = function () {
               <NButton type="error" ghost style="width:80px;" @click="showResetModal">
                 {{ $t('admin.chooseAccount') }}
               </NButton>
+            </div>
+          </div>
+        </div>
+        <div class="flex flex-col gap">
+          <div class="flex justify-between items-center my-2">
+            <h3 class="text-lg font-bold">
+              {{ $t('admin.rootAPIConfig') }}
+            </h3>
+            <div class="">
+              <NButton
+                type="default" ghost style="margin-right: 10px;" @click="clickResetApiConfig"
+              >{{ $t('common.reset') }}
+              </NButton>
+              <NButton
+                type="error" style="margin-right: 10px;" @click="clickSaveApiConfig"
+              >{{ $t('common.save') }}
+              </NButton>
+            </div>
+          </div>
+          <div class="flex flex-col p-3 gap-4 bg-[#e5e7eb] rounded-xl dark:bg-[#28282c]">
+            <div class="flex justify-between items-center gap-4">
+              <p class="text-base flex-none whitespace-nowrap overflow-hidden overflow-ellipsis">
+                {{ $t('admin.rootApiKey') }}
+              </p>
+              <NInput class="flex-grow"
+                v-model:value="apiConfig.apiKey"
+              />
+            </div>
+            <div class="flex justify-between items-center gap-3">
+              <p class="text-base flex-none whitespace-nowrap overflow-hidden overflow-ellipsis">
+                {{ $t('admin.rootApiBaseUrl') }}
+              </p>
+              <NInput class="flex-grow"
+                v-model:value="apiConfig.apiBaseUrl"
+              />
             </div>
           </div>
         </div>

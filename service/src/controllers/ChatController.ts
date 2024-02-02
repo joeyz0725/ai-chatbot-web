@@ -15,7 +15,7 @@ export class ChatController {
     this.chatService = new ChatService()
   }
 
-  private async handlechatReply(parameters: {
+  private async handlechatReply(userId: number, parameters: {
     message: string
     lastContext: any
     process: (chat: ChatMessage) => void
@@ -24,7 +24,7 @@ export class ChatController {
     top_p: number
   }): Promise<void> {
     // 在这里实现 chatReplyProcess 方法的逻辑
-    await chatReplyProcess(parameters)
+    await chatReplyProcess(userId, parameters)
   }
 
   private async sendMessageToChatGPT(req, res, { leftCount, isLogin }) {
@@ -33,7 +33,7 @@ export class ChatController {
     try {
       const { prompt, options = {}, systemMessage, temperature, top_p } = req.body as RequestProps
       let firstChunk = true
-      await this.handlechatReply({
+      await this.handlechatReply(req.userId, {
         message: prompt,
         lastContext: options,
         process: (chat: ChatMessage) => {

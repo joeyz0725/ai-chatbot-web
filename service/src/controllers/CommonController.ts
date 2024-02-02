@@ -4,7 +4,7 @@ import { ChatService } from '../services/ChatService'
 import { ConfigService } from '../services/ConfigService'
 import { isNumber } from '@/utils/is'
 import type { GptState, PasswordField } from '@/types'
-import { chatGptConfig } from '@/config/chatgpt'
+import { ChatGptConfig } from '@/config/chatgpt'
 import { initializeChatGPT } from '@/chatgpt'
 
 interface User {
@@ -29,11 +29,13 @@ export class CommonController {
   private commonService: CommonService
   private chatService: ChatService
   private configService: ConfigService
+  private chatGptConfig: ChatGptConfig
 
   constructor() {
     this.commonService = new CommonService()
     this.chatService = new ChatService()
     this.configService = new ConfigService()
+    this.chatGptConfig = new ChatGptConfig()
   }
 
   // 在响应头上添加 JWT
@@ -69,10 +71,10 @@ export class CommonController {
         }
         // 再查询配置的gpt
         const totalResult = await this.findOrCreateGptConfig(userId, result)
-        // 再初始化单例的ChatGPT配置项
-        await chatGptConfig.initializeGptState(userId)
+        // 再初始化ChatGPT配置项
+        await this.chatGptConfig.initializeGptState(userId)
         // 再刷新chatgpt/index.ts配置的部分gpt配置
-        await initializeChatGPT()
+        await initializeChatGPT(userId)
 
         res.send(totalResult)
       } else {
@@ -88,11 +90,12 @@ export class CommonController {
   public async findOrCreateGptConfig(userId: number, totalResult: TotalResult): Promise<TotalResult> {
     const result = await this.configService.findOrCreateGptConfig(userId)
     if (result.success) {
-      const { model, openaiAddress, openaiApiKey, reverseProxyAddress, accessToken } = result.data
+      const { model, openaiAddress, openaiApiKey, temperature, reverseProxyAddress, accessToken } = result.data
       totalResult.data.config = {
         model,
         openaiAddress,
         openaiApiKey,
+        temperature,
         reverseProxyAddress,
         accessToken,
       }
@@ -108,10 +111,10 @@ export class CommonController {
       const ipv4Address = extractIPv4Address(ipAddress)
       // 去查当前ip下剩余的聊天次数
       const leftCount = await this.chatService.getLeftCountByIpAddress(ipv4Address, sessionId)
-      // 销毁单例的ChatGPT配置项
-      chatGptConfig.destroyGptState()
+      // 销毁ChatGPT配置项
+      this.chatGptConfig.destroyGptState()
       // 再刷新chatgpt/index.ts配置的部分gpt配置
-      await initializeChatGPT()
+      await initializeChatGPT(userId)
       res.send({ status: 'Success', success: true, data: { leftCount } })
     }
     else {

@@ -1,4 +1,5 @@
 import { AdminService } from '../services/AdminService'
+import { getEnvApiConfig, saveEnvApiConfig } from '@/config/init'
 
 export class AdminController {
   private adminService: AdminService
@@ -46,5 +47,44 @@ export class AdminController {
     }
     const result = await this.adminService.resetUserPasswords(ids)
     res.send(result)
+  }
+
+  public async fetchApiConfig(req, res) {
+    const userId = req.userId
+    if (userId != null) {
+      const result = await this.adminService.checkAuthority(userId)
+      if (result.success) {
+        const data = getEnvApiConfig()
+        res.send({ success: true, data: data })
+      }else{
+        res.send(result)
+      }
+    }
+    else {
+      res.send({ success: false, message: '无权限查询' })
+    }
+    res.end()
+  }
+
+  public async saveApiConfig(req, res) {
+    const userId = req.userId
+    const apiConfig = req.body.config || {}
+    if (userId != null) {
+      const result = await this.adminService.checkAuthority(userId)
+      if (result.success) {
+        const saveSuccess = saveEnvApiConfig(apiConfig)
+        if (saveSuccess) {
+          res.send({ success: true, message: '保存成功', data: apiConfig})
+        } else {
+          res.send({ success: false, message: '保存失败' })
+        }
+      }else{
+        res.send(result)
+      }
+    }
+    else {
+      res.send({ success: false, message: '无权限查询' })
+    }
+    res.end()
   }
 }

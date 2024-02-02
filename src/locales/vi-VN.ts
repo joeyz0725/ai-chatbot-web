@@ -8,6 +8,7 @@ export default {
     deleteSuccess: 'Xóa thành công',
     save: 'Lưu',
     saveSuccess: 'Lưu thành công',
+    saveFailure: 'Lưu thất bại',
     reset: 'Đặt lại',
     action: 'Hành động',
     export: 'Xuất',
@@ -29,6 +30,8 @@ export default {
     unauthorizedTips: 'Không được ủy quyền, vui lòng xác minh trước.',
     stopResponding: 'Dừng',
     user: 'Người dùng',
+    searchSuccess: "Tìm kiếm thành công",
+    searchFailure: "Tìm kiếm thất bại"
   },
   chat: {
     newChatTitle: 'Cuộc trò chuyện mới',
@@ -170,7 +173,10 @@ export default {
     changePassword: 'Thay đổi mật khẩu',
     oldPassword: 'Mật khẩu cũ',
     newPassword: 'Mật khẩu mới',
-    confirmNewPassword: 'Xác nhận mật khẩu mới'
+    confirmNewPassword: 'Xác nhận mật khẩu mới',
+    rootAPIConfig: "Cấu hình API công cộng",
+    rootApiKey: "Khóa API công cộng",
+    rootApiBaseUrl: "Địa chỉ API công cộng",
   },
   upgrade: {
     selectItem: 'Chọn tài khoản của bạn',

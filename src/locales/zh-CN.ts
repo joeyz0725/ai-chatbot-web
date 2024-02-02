@@ -8,6 +8,7 @@ export default {
     deleteSuccess: '删除成功',
     save: '保存',
     saveSuccess: '保存成功',
+    saveFailure: '保存失败',
     reset: '重置',
     action: '操作',
     export: '导出',
@@ -29,6 +30,8 @@ export default {
     unauthorizedTips: '未经授权，请先进行验证。',
     stopResponding: '停止',
     user: '用户',
+    searchSuccess: '查询成功',
+    searchFailure: '查询失败',
   },
   chat: {
     newChatTitle: '新的对话',
@@ -129,7 +132,7 @@ export default {
     userOnly: '以下配置仅限VIP用户使用',
     chatGPTConfig: '访问接口配置',
     model: '模型',
-    openaiAddress: '接口地址',
+    openaiAddress: 'API 地址',
     openaiApiKey: 'API Key',
     reverseProxyAddress: '反向代理地址',
     accessToken: 'Access Token',
@@ -170,7 +173,10 @@ export default {
     changePassword: '修改密码',
     oldPassword: '初始密码',
     newPassword: '新的密码',
-    confirmNewPassword: '确认密码'
+    confirmNewPassword: '确认密码',
+    rootAPIConfig: '公共API配置',
+    rootApiKey: '公共APIKey',
+    rootApiBaseUrl: '公共API地址'
   },
   upgrade: {
     selectItem: '选择您的账户',

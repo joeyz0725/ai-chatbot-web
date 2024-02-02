@@ -9,11 +9,15 @@ import { sendResponse } from '../utils'
 import { isNotEmptyString } from '../utils/is'
 import type { ApiModel, ChatContext, ChatGPTUnofficialProxyAPIOptions, ModelConfig } from '../types'
 import type { RequestOptions, SetProxyOptions, UsageResponse } from './types'
-import { chatGptConfig } from '@/config/chatgpt'
+import { ChatGptConfig, defaultGptState } from '@/config/chatgpt'
+import type { GptState } from '@/types'
 
 const { HttpsProxyAgent } = httpsProxyAgent
 // 用户配置的chatgpt的一些配置项，从数据库中动态获取的
-let userGptConfig = chatGptConfig.getGptState()
+let userGptConfig = defaultGptState();
+(async () => {
+  userGptConfig = await new ChatGptConfig().getGptState()
+})();
 
 dotenv.config()
 
@@ -39,9 +43,9 @@ if ((userGptConfig.openaiApiKey || !isNotEmptyString(process.env.OPENAI_API_KEY)
 
 let api: ChatGPTAPI | ChatGPTUnofficialProxyAPI
 
-async function initializeChatGPT() {
+async function initializeChatGPT(userId?: number) {
   // More Info: https://github.com/transitive-bullshit/chatgpt-api
-  userGptConfig = chatGptConfig.getGptState()
+  userGptConfig = await new ChatGptConfig().getGptState(userId)
   model = userGptConfig.model
 
   if (userGptConfig.openaiApiKey || isNotEmptyString(process.env.OPENAI_API_KEY)) {
@@ -76,7 +80,6 @@ async function initializeChatGPT() {
       options.apiBaseUrl = `${OPENAI_API_BASE_URL}/v1`
 
     setupProxy(options)
-
     api = new ChatGPTAPI({ ...options })
     apiModel = 'ChatGPTAPI'
   }
@@ -99,17 +102,17 @@ async function start() {
 }
 start()
 
-async function chatReplyProcess(options: RequestOptions) {
-  userGptConfig = chatGptConfig.getGptState()
-  model = userGptConfig.model
-
-  const { message, lastContext, process, systemMessage, temperature, top_p } = options
+async function chatReplyProcess(userId, options: RequestOptions) {
+  await initializeChatGPT(userId)
+  
+  let { message, lastContext, process, systemMessage, temperature, top_p } = options
   try {
     let options: SendMessageOptions = { timeoutMs }
 
     if (apiModel === 'ChatGPTAPI') {
       if (isNotEmptyString(systemMessage))
         options.systemMessage = systemMessage
+      temperature = Number(userGptConfig.temperature)
       options.completionParams = { model, temperature, top_p }
     }
 
@@ -139,7 +142,7 @@ async function chatReplyProcess(options: RequestOptions) {
 }
 
 async function fetchUsage() {
-  userGptConfig = chatGptConfig.getGptState()
+  userGptConfig = await new ChatGptConfig().getGptState()
 
   const OPENAI_API_KEY = userGptConfig.openaiApiKey || process.env.OPENAI_API_KEY
   const OPENAI_API_BASE_URL = userGptConfig.openaiAddress || process.env.OPENAI_API_BASE_URL
@@ -191,7 +194,7 @@ function formatDate(): string[] {
 }
 
 async function chatConfig() {
-  userGptConfig = chatGptConfig.getGptState()
+  userGptConfig = await new ChatGptConfig().getGptState()
 
   const usage = await fetchUsage()
   const reverseProxy = userGptConfig.reverseProxyAddress ?? process.env.API_REVERSE_PROXY ?? '-'

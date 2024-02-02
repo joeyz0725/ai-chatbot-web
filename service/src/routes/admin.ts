@@ -22,4 +22,12 @@ adminRouter.post('/reset-password', [authenticateUser], async (req, res) => {
   await adminController.resetPassword(req, res)
 })
 
+adminRouter.get('/fetch-api-config', [authenticateUser], async (req, res) => {
+  await adminController.fetchApiConfig(req, res)
+})
+
+adminRouter.post('/save-api-config', [authenticateUser], async (req, res) => {
+  await adminController.saveApiConfig(req, res)
+})
+
 export default adminRouter

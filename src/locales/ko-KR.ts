@@ -8,6 +8,7 @@ export default {
     deleteSuccess: '삭제 성공',
     save: '저장',
     saveSuccess: '저장 성공',
+    saveFailure: '저장 실패',
     reset: '초기화',
     action: '작업',
     export: '내보내기',
@@ -29,6 +30,8 @@ export default {
     unauthorizedTips: '승인되지 않았습니다. 먼저 확인하세요.',
     stopResponding: '중지',
     user: '사용자',
+    searchSuccess: "검색 성공",
+    searchFailure: "검색 실패"
   },
   chat: {
     newChatTitle: '새 채팅',
@@ -170,7 +173,10 @@ export default {
     changePassword: '비밀번호 변경',
     oldPassword: '초기 비밀번호',
     newPassword: '새 비밀번호',
-    confirmNewPassword: '비밀번호 확인'
+    confirmNewPassword: '비밀번호 확인',
+    rootAPIConfig: "공용 API 구성",
+    rootApiKey: "공용 API 키",
+    rootApiBaseUrl: "공용 API 주소",
   },
   upgrade: {
     selectItem: '계정 선택',

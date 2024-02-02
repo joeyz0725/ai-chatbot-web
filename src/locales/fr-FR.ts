@@ -8,6 +8,7 @@ export default {
     deleteSuccess: 'Supprimé avec succès',
     save: 'Enregistrer',
     saveSuccess: 'Enregistrement réussi',
+    saveFailure: "Échec de l'enregistrement",
     reset: 'Réinitialiser',
     action: 'Action',
     export: 'Exporter',
@@ -29,6 +30,8 @@ export default {
     unauthorizedTips: 'Non autorisé. Veuillez vérifier d\'abord.',
     stopResponding: 'Arrêter',
     user: 'Utilisateur',
+    searchSuccess: "Recherche réussie",
+    searchFailure: "Échec de la recherche"
   },
   chat: {
     newChatTitle: 'Nouvelle Conversation',
@@ -170,7 +173,10 @@ export default {
     changePassword: 'Changer le Mot de Passe',
     oldPassword: 'Ancien Mot de Passe',
     newPassword: 'Nouveau Mot de Passe',
-    confirmNewPassword: 'Confirmer le Mot de Passe'
+    confirmNewPassword: 'Confirmer le Mot de Passe',
+    rootAPIConfig: "Configuration de l'API publique",
+    rootApiKey: "Clé de l'API publique",
+    rootApiBaseUrl: "Adresse de l'API publique",
   },
   upgrade: {
     selectItem: 'Sélectionnez Votre Compte',

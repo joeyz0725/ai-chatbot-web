@@ -8,6 +8,7 @@ export default {
     deleteSuccess: 'Successfully deleted',
     save: 'Save',
     saveSuccess: 'Successfully saved',
+    saveFailure: 'Save failure',
     reset: 'Reset',
     action: 'Action',
     export: 'Export',
@@ -29,6 +30,8 @@ export default {
     unauthorizedTips: 'Unauthorized. Please verify first.',
     stopResponding: 'Stop',
     user: 'User',
+    searchSuccess: "Search successful",
+    searchFailure: "Search failed"
   },
   chat: {
     newChatTitle: 'New Conversation',
@@ -170,7 +173,10 @@ export default {
     changePassword: 'Change Password',
     oldPassword: 'Old Password',
     newPassword: 'New Password',
-    confirmNewPassword: 'Confirm Password'
+    confirmNewPassword: 'Confirm Password',
+    rootAPIConfig: "Public API Configuration",
+    rootApiKey: "Public API Key",
+    rootApiBaseUrl: "Public API Address",
   },
   upgrade: {
     selectItem: 'Select Your Account',

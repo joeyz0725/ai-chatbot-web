@@ -8,6 +8,7 @@ export default {
     deleteSuccess: '削除に成功しました',
     save: '保存',
     saveSuccess: '保存に成功しました',
+    saveFailure: '保存に失敗しました',
     reset: 'リセット',
     action: 'アクション',
     export: 'エクスポート',
@@ -29,6 +30,8 @@ export default {
     unauthorizedTips: '未承認です。まず検証してください。',
     stopResponding: '停止',
     user: 'ユーザー',
+    searchSuccess: "検索成功",
+    searchFailure: "検索失敗"
   },
   chat: {
     newChatTitle: '新しいチャット',
@@ -170,7 +173,10 @@ export default {
     changePassword: 'パスワードを変更',
     oldPassword: '古いパスワード',
     newPassword: '新しいパスワード',
-    confirmNewPassword: 'パスワードを確認'
+    confirmNewPassword: 'パスワードを確認',
+    rootAPIConfig: "パブリックAPI設定",
+    rootApiKey: "パブリックAPIキー",
+    rootApiBaseUrl: "パブリックAPIアドレス",
   },
   upgrade: {
     selectItem: 'アカウントを選択',

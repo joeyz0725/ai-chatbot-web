@@ -2,7 +2,6 @@ import { getRepository } from 'typeorm'
 import { ChatgptConfig } from '../models/ChatGPTConfig'
 import type { User } from '../models/User'
 import type { GptState } from '@/types'
-import { isString } from '@/utils/is'
 
 export class ConfigService {
   public async findOrCreateGptConfig(userId: number) {
@@ -36,13 +35,9 @@ export class ConfigService {
       existingConfig.model = gptState.model
       existingConfig.openaiAddress = gptState.openaiAddress
       existingConfig.openaiApiKey = gptState.openaiApiKey
-      if (isString(gptState.temperature)) {
-        existingConfig.temperature = Number(gptState.temperature)
-      }
+      existingConfig.temperature = Number(gptState.temperature)
       existingConfig.reverseProxyAddress = gptState.reverseProxyAddress
       existingConfig.accessToken = gptState.accessToken
-      
-
       try {
         await configRepository.save(existingConfig)
       }
@@ -55,9 +50,7 @@ export class ConfigService {
       newConfig.model = gptState.model
       newConfig.openaiAddress = gptState.openaiAddress
       newConfig.openaiApiKey = gptState.openaiApiKey
-      if (isString(gptState.temperature)) {
-        newConfig.temperature = Number(gptState.temperature)
-      }
+      newConfig.temperature = Number(gptState.temperature)
       newConfig.reverseProxyAddress = gptState.reverseProxyAddress
       newConfig.accessToken = gptState.accessToken
       newConfig.user = { id: userId } as User

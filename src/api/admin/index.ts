@@ -24,3 +24,13 @@ export function resetPasswordAPI(ids: number[]) {
   )
 }
 
+export function fetchApiConfig() {
+  return myAxios.get('/admin/fetch-api-config')
+}
+
+export function saveApiConfig(config: any) {
+  return myAxios.post('/admin/save-api-config',
+    { config }
+  )
+}
+

@@ -9,7 +9,7 @@ configRouter.use(express.json())
 
 const configController = new ConfigController()
 
-configRouter.post('/gpt', [authenticateUser], async (req, res) => {
+configRouter.get('/gpt', [authenticateUser], async (req, res) => {
   await configController.fetchChatgptConfig(req, res)
 })
 

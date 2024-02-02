@@ -278,20 +278,20 @@ const resetConfig = function () {
               </div>
               <div class="flex flex-wrap justify-between items-center">
                 <p class="text-base" style="flex: 0 0 auto;">
-                  {{ $t('setting.openaiAddress') }}
+                  {{ $t('setting.openaiApiKey') }}
                 </p>
                 <NInput
-                  v-model:value="gptConfig.openaiAddress"
+                  v-model:value="gptConfig.openaiApiKey"
                   style="flex: 0 0 auto; width: 200px;" @update:value="handleInputChange"
                   :disabled="roleType < 20 || roleType === undefined"
                 />
               </div>
               <div class="flex flex-wrap justify-between items-center">
                 <p class="text-base" style="flex: 0 0 auto;">
-                  {{ $t('setting.openaiApiKey') }}
+                  {{ $t('setting.openaiAddress') }}
                 </p>
                 <NInput
-                  v-model:value="gptConfig.openaiApiKey"
+                  v-model:value="gptConfig.openaiAddress"
                   style="flex: 0 0 auto; width: 200px;" @update:value="handleInputChange"
                   :disabled="roleType < 20 || roleType === undefined"
                 />

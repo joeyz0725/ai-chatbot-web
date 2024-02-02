@@ -1,4 +1,6 @@
 import { ss } from '@/utils/storage'
+import { useTokenStore } from '../token'
+import { fetchChatgptAPI } from '@/api/config'
 
 export type Model = 'gpt-3.5-turbo' | 'gpt-4'
 
@@ -13,6 +15,8 @@ export interface GptState {
   accessToken: string
 }
 
+const tokenStore = useTokenStore()
+
 export function defaultConfig(): GptState {
   return {
     model: 'gpt-3.5-turbo',
@@ -22,6 +26,18 @@ export function defaultConfig(): GptState {
     reverseProxyAddress: '',
     accessToken: '',
   }
+}
+
+export function getGptConfig(): GptState {
+  const token = tokenStore.getToken()
+  if (token) {
+    fetchChatgptAPI().then((data) => {
+      const serverGptConfig = data.data.data
+      const result = { ...defaultConfig(), ...serverGptConfig }
+      return result
+    })
+  }
+  return { ...defaultConfig(), ...getLocalConfig() }
 }
 
 export function getLocalConfig(): GptState {

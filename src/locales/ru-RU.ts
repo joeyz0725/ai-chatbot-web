@@ -8,6 +8,7 @@ export default {
     deleteSuccess: 'Успешно удалено',
     save: 'Сохранить',
     saveSuccess: 'Успешно сохранено',
+    saveFailure: 'Ошибка сохранения',
     reset: 'Сбросить',
     action: 'Действие',
     export: 'Экспорт',
@@ -29,6 +30,8 @@ export default {
     unauthorizedTips: 'Не авторизовано. Пожалуйста, сначала проведите проверку.',
     stopResponding: 'Остановить',
     user: 'Пользователь',
+    searchSuccess: "Поиск успешен",
+    searchFailure: "Поиск не удался"
   },
   chat: {
     newChatTitle: 'Новый чат',
@@ -170,7 +173,10 @@ export default {
     changePassword: 'Изменить пароль',
     oldPassword: 'Исходный пароль',
     newPassword: 'Новый пароль',
-    confirmNewPassword: 'Подтвердите пароль'
+    confirmNewPassword: 'Подтвердите пароль',
+    rootAPIConfig: "Конфигурация общедоступного API",
+    rootApiKey: "Ключ общедоступного API",
+    rootApiBaseUrl: "Адрес общедоступного API",
   },
   upgrade: {
     selectItem: 'Выберите свой аккаунт',
